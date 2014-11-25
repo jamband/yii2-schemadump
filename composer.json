@@ -1,0 +1,26 @@
+{
+    "name": "jamband/yii2-schemadump",
+    "description": "Generate the schema from an existing database",
+    "keywords": [
+        "yii2",
+        "extesion",
+        "command",
+        "migration",
+        "generator"
+    ],
+    "homepage": "https://github.com/jamband/yii2-schemadump",
+    "type": "yii2-extension",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tomoki Morita",
+            "email": "tmsongbooks215@gmail.com",
+            "homepage": "http://jamband.github.io/"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "jamband\\": ""
+        }
+    }
+}
