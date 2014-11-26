@@ -59,3 +59,33 @@ $this->createTable('{{%user}}', [
     'password' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'パスワード'",
 ], $this->tableOptions);
 ```
+
+Copy the output code and paste it into a file.
+
+## Commands
+
+Generates the 'createTable' code. (default)
+
+```
+./yii schemadump <existing_database_name>
+./yii schemadump/create <existing_database_name>
+```
+
+Generates the 'dropTable' code.
+
+```
+./yii schemadump/drop <existing_database_name>
+```
+
+Useful commands (for OS X user):
+
+```
+./yii schemadump <existing_database_name> | pbcopy
+./yii schemadump/drop <existing_database_name> | pbcopy
+```
+
+Check help.
+
+```
+./yii help schemadump
+```
