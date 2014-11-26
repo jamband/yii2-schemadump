@@ -4,7 +4,7 @@ This is a command to generate the schema from an existing database with Yii 2 Fr
 
 ## Demo
 
-Under development ...
+![gif](http://jamband.github.io/images/yii2-schemadump.gif)
 
 ## Installation
 
