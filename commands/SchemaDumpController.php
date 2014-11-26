@@ -13,6 +13,11 @@ use yii\db\Connection;
 class SchemaDumpController extends Controller
 {
     /**
+     * @inheritdoc
+     */
+    public $defaultAction = 'create';
+
+    /**
      * @var string a migration table name
      */
     public $migrationTable = 'migration';
@@ -55,7 +60,7 @@ class SchemaDumpController extends Controller
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema name.
      * @return integer the status of the action execution
      */
-    public function actionIndex($schema = '')
+    public function actionCreate($schema = '')
     {
         $stdout = '';
         $tables = $this->db->schema->getTableSchemas($schema);
