@@ -1,6 +1,6 @@
 <?php
 
-namespace jambands\migrations;
+namespace jamband\migrations;
 
 use Yii;
 
