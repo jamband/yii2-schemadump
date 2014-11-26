@@ -56,7 +56,7 @@ class SchemaDumpController extends Controller
     }
 
     /**
-     * Generate the migration code from database schema.
+     * Generates the 'createTable' code.
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema name.
      * @return integer the status of the action execution
      */
@@ -88,7 +88,7 @@ class SchemaDumpController extends Controller
     }
 
     /**
-     * Generates drop table.
+     * Generates the 'dropTable' code.
      * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema name.
      * @return integer the status of the action execution
      */
