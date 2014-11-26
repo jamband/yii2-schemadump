@@ -18,6 +18,7 @@
             "homepage": "http://jamband.github.io/"
         }
     ],
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "jamband\\": ""
