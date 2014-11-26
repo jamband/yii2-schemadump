@@ -203,8 +203,11 @@ class SchemaDumpController extends Controller
         if (!$column->allowNull && !$column->isPrimaryKey) {
             $definition .= ' NOT NULL';
         }
-        if ($column->defaultValue !== null) {
+        if (is_string($column->defaultValue)) {
             $definition .= " DEFAULT '$column->defaultValue'";
+        }
+        if ($column->defaultValue instanceof \yii\db\Expression) {
+            $definition .= " DEFAULT $column->defaultValue";
         }
         if ($column->comment !== '') {
             $definition .= " COMMENT '$column->comment'";
