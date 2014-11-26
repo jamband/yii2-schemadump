@@ -60,7 +60,7 @@ $this->createTable('{{%user}}', [
 ], $this->tableOptions);
 ```
 
-Copy the output code and paste it into a file.
+Copy the output code and paste it into a migration file.
 
 ## Commands
 
