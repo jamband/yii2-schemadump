@@ -100,7 +100,10 @@ class SchemaDumpController extends Controller
             $stdout .= $this->generateForeignKey($table);
         }
 
-        echo strtr($stdout, [' . ""' => '']);
+        echo strtr($stdout, [
+            ' . ""' => '',
+            '" . "' => '',
+        ]);
     }
 
     /**
@@ -159,6 +162,9 @@ class SchemaDumpController extends Controller
         // type: other
         if ($column->dbType === 'tinyint(1)') {
             return 'Schema::TYPE_BOOLEAN';
+        }
+        if ($column->enumValues !== null) {
+            return "\"$column->dbType\"";
         }
         switch ($column->type) {
             case 'string':
