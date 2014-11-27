@@ -86,6 +86,13 @@ class SchemaDumpController extends Controller
                 $stdout .= "    '$column->name' => {$this->getSchemaType($column)} . \"{$this->otherDefinition($column)}\",\n";
             }
 
+            if ($this->isCompositePk($table)) {
+                $stdout .= "    'PRIMARY KEY (" . implode(', ', $table->primaryKey) . ")',\n";
+
+            } elseif (!empty($table->primaryKey) && false === strpos($stdout, 'Schema::TYPE_PK')) {
+                $stdout .= "    'PRIMARY KEY ({$table->primaryKey[0]})',\n";
+            }
+
             $stdout .= "], \$this->tableOptions);\n\n";
         }
 
@@ -142,7 +149,7 @@ class SchemaDumpController extends Controller
     private function getSchemaType($column)
     {
         // type: pk
-        if ($column->isPrimaryKey) {
+        if ($column->autoIncrement) {
             if ($column->type === 'bigint') {
                 return 'Schema::TYPE_BIGPK';
             }
@@ -194,13 +201,13 @@ class SchemaDumpController extends Controller
     {
         $definition = '';
 
-        if ($column->size !== null && !$column->isPrimaryKey && $column->dbType !== 'tinyint(1)') {
+        if ($column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)') {
             $definition .= "($column->size)";
         }
         if ($column->unsigned) {
             $definition .= ' UNSIGNED';
         }
-        if (!$column->allowNull && !$column->isPrimaryKey) {
+        if (!$column->allowNull && !$column->autoIncrement) {
             $definition .= ' NOT NULL';
         }
         if (is_string($column->defaultValue)) {
@@ -214,6 +221,16 @@ class SchemaDumpController extends Controller
         }
 
         return $definition;
+    }
+
+    /**
+     * Whether the composite primary key.
+     * @param TableSchema[] $table
+     * @return boolean
+     */
+    private function isCompositePk($table)
+    {
+        return count($table->primaryKey) >= 2;
     }
 
     /**
