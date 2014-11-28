@@ -89,3 +89,16 @@ Check help.
 ```
 ./yii help schemadump
 ```
+
+## Supports
+
+- Types
+- Size
+- Unsigned
+- NOT NULL
+- DEFAULT value
+- COMMENT
+- Foreign key
+- Composite primary keys
+- Primary key without AUTO_INCREMENT
+- ENUM type (for MySQL)
