@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace jamband\migrations;
+namespace jamband\schemadump;
 
 use Yii;
 

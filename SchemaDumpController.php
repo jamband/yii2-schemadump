@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace jamband\commands;
+namespace jamband\schemadump;
 
 use Yii;
 use yii\console\Exception;

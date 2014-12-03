@@ -8,7 +8,7 @@ echo "<?php\n";
 ?>
 
 use yii\db\Schema;
-use jamband\migrations\Migration;
+use jamband\schemadump\Migration;
 
 class <?= $className ?> extends Migration
 {
