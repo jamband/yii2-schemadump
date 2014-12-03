@@ -31,7 +31,7 @@ return [
     'controllerMap' => [
         'migrate' => [
             'class' => 'yii\console\controllers\MigrateController',
-            'templateFile' => '@vendor/jamband/yii2-schemadump/template.php',
+            'templateFile' => '@jamband/schemadump/template.php',
         ],
         'schemadump' => [
             'class' => 'jamband\schemadump\SchemaDumpController',
