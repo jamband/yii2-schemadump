@@ -100,10 +100,10 @@ class SchemaDumpController extends Controller
             $stdout .= $this->generateForeignKey($table);
         }
 
-        echo strtr($stdout, [
+        $this->stdout(strtr($stdout, [
             ' . ""' => '',
             '" . "' => '',
-        ]);
+        ]));
     }
 
     /**
@@ -141,7 +141,7 @@ class SchemaDumpController extends Controller
             $stdout .= "\n";
         }
 
-        echo $stdout;
+        $this->stdout($stdout);
     }
 
     /**
