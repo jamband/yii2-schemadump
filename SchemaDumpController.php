@@ -97,6 +97,7 @@ class SchemaDumpController extends Controller
         $stdout = '';
         $tables = $this->db->schema->getTableSchemas($schema);
 
+        $offset = 0;
         foreach ($tables as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
@@ -109,14 +110,17 @@ class SchemaDumpController extends Controller
                 $stdout .= "    '$column->name' => {$this->getSchemaType($column)} . \"{$this->otherDefinition($column)}\",\n";
             }
 
-            if ($this->isCompositePk($table)) {
-                $stdout .= "    'PRIMARY KEY (" . implode(', ', $table->primaryKey) . ")',\n";
+            if (!empty($table->primaryKey)) {
+                if (count($table->primaryKey) >= 2) {
+                    $stdout .= "    'PRIMARY KEY (" . implode(', ', $table->primaryKey) . ")',\n";
 
-            } elseif (!empty($table->primaryKey) && false === strpos($stdout, $this->type['pk'])) {
-                $stdout .= "    'PRIMARY KEY ({$table->primaryKey[0]})',\n";
+                } elseif (false === strpos($stdout, $this->type['pk'], $offset) && false === strpos($stdout, $this->type['bigpk'], $offset)) {
+                    $stdout .= "    'PRIMARY KEY ({$table->primaryKey[0]})',\n";
+                }
             }
 
             $stdout .= "], \$this->tableOptions);\n\n";
+            $offset = mb_strlen($stdout, Yii::$app->charset);
         }
 
         foreach ($tables as $table) {
@@ -196,7 +200,10 @@ class SchemaDumpController extends Controller
     {
         $definition = '';
 
-        if (($column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)') || $column->unsigned) {
+        if (
+            ($column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)') ||
+            ($column->size !== null && $column->unsigned)
+        ) {
             $definition .= "($column->size)";
         }
 
@@ -226,16 +233,6 @@ class SchemaDumpController extends Controller
         }
 
         return $definition;
-    }
-
-    /**
-     * Whether the composite primary key.
-     * @param TableSchema[] $table
-     * @return boolean
-     */
-    private function isCompositePk($table)
-    {
-        return count($table->primaryKey) >= 2;
     }
 
     /**
