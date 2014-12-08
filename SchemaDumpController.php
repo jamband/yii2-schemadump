@@ -152,7 +152,7 @@ class SchemaDumpController extends Controller
     private function getSchemaType($column)
     {
         // type: pk
-        if ($column->autoIncrement) {
+        if ($column->autoIncrement && !$column->unsigned) {
             if ($column->type === 'bigint') {
                 return 'Schema::TYPE_BIGPK';
             }
@@ -207,7 +207,10 @@ class SchemaDumpController extends Controller
     {
         $definition = '';
 
-        if ($column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)') {
+        if (
+            $column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)' ||
+            $column->autoIncrement && $column->unsigned
+        ) {
             $definition .= "($column->size)";
         }
         if ($column->unsigned) {
@@ -215,6 +218,9 @@ class SchemaDumpController extends Controller
         }
         if (!$column->allowNull && !$column->autoIncrement) {
             $definition .= ' NOT NULL';
+        }
+        if (!$column->allowNull && $column->autoIncrement && $column->unsigned) {
+            $definition .= ' NOT NULL AUTO_INCREMENT';
         }
         if (is_string($column->defaultValue)) {
             $definition .= " DEFAULT '$column->defaultValue'";
