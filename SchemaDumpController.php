@@ -37,6 +37,29 @@ class SchemaDumpController extends Controller
     public $db = 'db';
 
     /**
+     * @var array the column types
+     * @see \yii\db\Schema
+     */
+    private $type = [
+        'pk'        => 'Schema::TYPE_PK',
+        'bigpk'     => 'Schema::TYPE_BIGPK',
+        'string'    => 'Schema::TYPE_STRING',
+        'text'      => 'Schema::TYPE_TEXT',
+        'smallint'  => 'Schema::TYPE_SMALLINT',
+        'integer'   => 'Schema::TYPE_INTEGER',
+        'bigint'    => 'Schema::TYPE_BIGINT',
+        'float'     => 'Schema::TYPE_FLOAT',
+        'decimal'   => 'Schema::TYPE_DECIMAL',
+        'datetime'  => 'Schema::TYPE_DATETIME',
+        'timestamp' => 'Schema::TYPE_TIMESTAMP',
+        'time'      => 'Schema::TYPE_TIME',
+        'date'      => 'Schema::TYPE_DATE',
+        'binary'    => 'Schema::TYPE_BINARY',
+        'boolean'   => 'Schema::TYPE_BOOLEAN',
+        'money'     => 'Schema::TYPE_MONEY',
+    ];
+
+    /**
      * @inheritdoc
      */
     public function options($actionID)
@@ -89,7 +112,7 @@ class SchemaDumpController extends Controller
             if ($this->isCompositePk($table)) {
                 $stdout .= "    'PRIMARY KEY (" . implode(', ', $table->primaryKey) . ")',\n";
 
-            } elseif (!empty($table->primaryKey) && false === strpos($stdout, 'Schema::TYPE_PK')) {
+            } elseif (!empty($table->primaryKey) && false === strpos($stdout, $this->type['pk'])) {
                 $stdout .= "    'PRIMARY KEY ({$table->primaryKey[0]})',\n";
             }
 
@@ -154,48 +177,20 @@ class SchemaDumpController extends Controller
         // type: pk
         if ($column->autoIncrement && !$column->unsigned) {
             if ($column->type === 'bigint') {
-                return 'Schema::TYPE_BIGPK';
+                return $this->type['bigpk'];
             }
-            return 'Schema::TYPE_PK';
+            return $this->type['pk'];
         }
 
         // type: other
         if ($column->dbType === 'tinyint(1)') {
-            return 'Schema::TYPE_BOOLEAN';
+            return $this->type['boolean'];
         }
         if ($column->enumValues !== null) {
             return "\"$column->dbType\"";
         }
-        switch ($column->type) {
-            case 'string':
-                return 'Schema::TYPE_STRING';
-            case 'text':
-                return 'Schema::TYPE_TEXT';
-            case 'smallint':
-                return 'Schema::TYPE_SMALLINT';
-            case 'integer':
-                return 'Schema::TYPE_INTEGER';
-            case 'bigint':
-                return 'Schema::TYPE_BIGINT';
-            case 'float':
-                return 'Schema::TYPE_FLOAT';
-            case 'decimal':
-                return 'Schema::TYPE_DECIMAL';
-            case 'datetime':
-                return 'Schema::TYPE_DATETIME';
-            case 'timestamp':
-                return 'Schema::TYPE_TIMESTAMP';
-            case 'time':
-                return 'Schema::TYPE_TIME';
-            case 'date':
-                return 'Schema::TYPE_DATE';
-            case 'binary':
-                return 'Schema::TYPE_BINARY';
-            case 'boolean':
-                return 'Schema::TYPE_BOOLEAN';
-            case 'money':
-                return 'Schema::TYPE_MONEY';
-        }
+
+        return $this->type[$column->type];
     }
 
     /**
