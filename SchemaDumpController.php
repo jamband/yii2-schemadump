@@ -174,15 +174,9 @@ class SchemaDumpController extends Controller
      */
     private function getSchemaType($column)
     {
-        // type: pk
         if ($column->autoIncrement && !$column->unsigned) {
-            if ($column->type === 'bigint') {
-                return $this->type['bigpk'];
-            }
-            return $this->type['pk'];
+            return ($column->type === 'bigint') ? $this->type['bigpk'] : $this->type['pk'];
         }
-
-        // type: other
         if ($column->dbType === 'tinyint(1)') {
             return $this->type['boolean'];
         }
@@ -202,27 +196,31 @@ class SchemaDumpController extends Controller
     {
         $definition = '';
 
-        if (
-            $column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)' ||
-            $column->autoIncrement && $column->unsigned
-        ) {
+        if (($column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)') || $column->unsigned) {
             $definition .= "($column->size)";
         }
+
         if ($column->unsigned) {
             $definition .= ' UNSIGNED';
         }
-        if (!$column->allowNull && !$column->autoIncrement) {
+
+        if ($column->allowNull) {
+            $definition .= ' NULL';
+
+        } elseif (!$column->autoIncrement) {
             $definition .= ' NOT NULL';
-        }
-        if (!$column->allowNull && $column->autoIncrement && $column->unsigned) {
+
+        } elseif ($column->autoIncrement && $column->unsigned) {
             $definition .= ' NOT NULL AUTO_INCREMENT';
         }
-        if (is_string($column->defaultValue)) {
-            $definition .= " DEFAULT '$column->defaultValue'";
-        }
+
         if ($column->defaultValue instanceof \yii\db\Expression) {
             $definition .= " DEFAULT $column->defaultValue";
+
+        } elseif ($column->defaultValue !== null) {
+            $definition .= " DEFAULT '$column->defaultValue'";
         }
+
         if ($column->comment !== '') {
             $definition .= " COMMENT '$column->comment'";
         }
