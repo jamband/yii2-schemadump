@@ -1,5 +1,7 @@
 # yii2-schemadump
 
+[![Latest Stable Version](https://poser.pugx.org/jamband/yii2-schemadump/v/stable.svg)](https://packagist.org/packages/jamband/yii2-schemadump) [![Total Downloads](https://poser.pugx.org/jamband/yii2-schemadump/downloads.svg)](https://packagist.org/packages/jamband/yii2-schemadump) [![Latest Unstable Version](https://poser.pugx.org/jamband/yii2-schemadump/v/unstable.svg)](https://packagist.org/packages/jamband/yii2-schemadump) [![License](https://poser.pugx.org/jamband/yii2-schemadump/license.svg)](https://packagist.org/packages/jamband/yii2-schemadump)
+
 This command to generate the schema from an existing database.
 
 ## Demo
