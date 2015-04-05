@@ -199,8 +199,9 @@ class SchemaDumpController extends Controller
     private function otherDefinition($column)
     {
         $definition = '';
-
-        if (
+        if ($column->type == 'decimal' && strpos($column->dbType, 'decimal')) {
+            $definition .= substr($column->dbType, strlen('decimal'));
+        } elseif (
             ($column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)') ||
             ($column->size !== null && $column->unsigned)
         ) {
