@@ -49,6 +49,7 @@ class SchemaDumpController extends Controller
         'integer'   => 'Schema::TYPE_INTEGER',
         'bigint'    => 'Schema::TYPE_BIGINT',
         'float'     => 'Schema::TYPE_FLOAT',
+        'double'    => 'Schema::TYPE_DOUBLE',
         'decimal'   => 'Schema::TYPE_DECIMAL',
         'datetime'  => 'Schema::TYPE_DATETIME',
         'timestamp' => 'Schema::TYPE_TIMESTAMP',
