@@ -37,30 +37,6 @@ class SchemaDumpController extends Controller
     public $db = 'db';
 
     /**
-     * @var array the column types
-     * @see \yii\db\Schema
-     */
-    private $type = [
-        'pk'        => 'Schema::TYPE_PK',
-        'bigpk'     => 'Schema::TYPE_BIGPK',
-        'string'    => 'Schema::TYPE_STRING',
-        'text'      => 'Schema::TYPE_TEXT',
-        'smallint'  => 'Schema::TYPE_SMALLINT',
-        'integer'   => 'Schema::TYPE_INTEGER',
-        'bigint'    => 'Schema::TYPE_BIGINT',
-        'float'     => 'Schema::TYPE_FLOAT',
-        'double'    => 'Schema::TYPE_DOUBLE',
-        'decimal'   => 'Schema::TYPE_DECIMAL',
-        'datetime'  => 'Schema::TYPE_DATETIME',
-        'timestamp' => 'Schema::TYPE_TIMESTAMP',
-        'time'      => 'Schema::TYPE_TIME',
-        'date'      => 'Schema::TYPE_DATE',
-        'binary'    => 'Schema::TYPE_BINARY',
-        'boolean'   => 'Schema::TYPE_BOOLEAN',
-        'money'     => 'Schema::TYPE_MONEY',
-    ];
-
-    /**
      * @inheritdoc
      */
     public function options($actionID)
@@ -115,7 +91,7 @@ class SchemaDumpController extends Controller
                 if (count($table->primaryKey) >= 2) {
                     $stdout .= "    'PRIMARY KEY (" . implode(', ', $table->primaryKey) . ")',\n";
 
-                } elseif (false === strpos($stdout, $this->type['pk'], $offset) && false === strpos($stdout, $this->type['bigpk'], $offset)) {
+                } elseif (false === strpos($stdout, $this->type('pk'), $offset) && false === strpos($stdout, $this->type('bigpk'), $offset)) {
                     $stdout .= "    'PRIMARY KEY ({$table->primaryKey[0]})',\n";
                 }
             }
@@ -180,16 +156,27 @@ class SchemaDumpController extends Controller
     private function getSchemaType($column)
     {
         if ($column->autoIncrement && !$column->unsigned) {
-            return ($column->type === 'bigint') ? $this->type['bigpk'] : $this->type['pk'];
+            return ($column->type === 'bigint') ? $this->type('bigpk') : $this->type('pk');
         }
         if ($column->dbType === 'tinyint(1)') {
-            return $this->type['boolean'];
+            return $this->type('boolean');
         }
         if ($column->enumValues !== null) {
             return "\"$column->dbType\"";
         }
 
-        return $this->type[$column->type];
+        return $this->type($column->type);
+    }
+
+    /**
+     * Returns the constant strings of yii\db\Schema class. e.g. Schema::TYPE_PK
+     * @param string $type the column type
+     * @return string
+     */
+    private function type($type)
+    {
+        $class = new \ReflectionClass('yii\db\Schema');
+        return 'Schema::' . implode(array_keys($class->getConstants(), $type));
     }
 
     /**
