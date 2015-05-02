@@ -164,17 +164,6 @@ class SchemaDumpController extends Controller
     }
 
     /**
-     * Returns the constant strings of yii\db\Schema class. e.g. Schema::TYPE_PK
-     * @param string $type the column type
-     * @return string
-     */
-    private function type($type)
-    {
-        $class = new \ReflectionClass('yii\db\Schema');
-        return $class->getShortName() . '::' . implode(array_keys($class->getConstants(), $type));
-    }
-
-    /**
      * Returns the other definition.
      * @param ColumnSchema[] $column
      * @return string the other definition
@@ -250,5 +239,16 @@ class SchemaDumpController extends Controller
         }
 
         return "$stdout\n";
+    }
+
+    /**
+     * Returns the constant strings of yii\db\Schema class. e.g. Schema::TYPE_PK
+     * @param string $type the column type
+     * @return string
+     */
+    private function type($type)
+    {
+        $class = new \ReflectionClass('yii\db\Schema');
+        return $class->getShortName() . '::' . implode(array_keys($class->getConstants(), $type));
     }
 }
