@@ -118,13 +118,11 @@ class SchemaDumpController extends Controller
     public function actionDrop($schema = '')
     {
         $stdout = '';
-        $tables = $this->db->schema->getTableSchemas($schema);
 
-        foreach ($tables as $table) {
+        foreach ($this->db->schema->getTableSchemas($schema) as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
-
             $stdout .= "\$this->dropTable('{{%$table->name}}');";
 
             if (!empty($table->foreignKeys)) {
@@ -138,13 +136,10 @@ class SchemaDumpController extends Controller
                         $stdout .= "$k, ";
                     }
                 }
-
-                $stdout = substr($stdout, 0, -2);
+                $stdout = rtrim($stdout, ', ');
             }
-
             $stdout .= "\n";
         }
-
         $this->stdout($stdout);
     }
 
