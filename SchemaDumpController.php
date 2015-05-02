@@ -233,16 +233,12 @@ class SchemaDumpController extends Controller
      */
     private function generateForeignKey($table)
     {
-        $stdout = '';
-        $foreignKeys = $table->foreignKeys;
-
-        if (empty($foreignKeys)) {
-            return $stdout;
+        if (empty($table->foreignKeys)) {
+            return;
         }
-
         $stdout = "// fk: $table->name\n";
 
-        foreach ($foreignKeys as $fk) {
+        foreach ($table->foreignKeys as $fk) {
             $refTable = '';
             $refColumns = '';
             $columns = '';
@@ -255,7 +251,6 @@ class SchemaDumpController extends Controller
                     $refColumns = $v;
                 }
             }
-
             $stdout .= "\$this->addForeignKey('fk_{$table->name}_{$columns}', '{{%$table->name}}', '$columns', '{{%$refTable}}', '$refColumns');\n";
         }
 
