@@ -71,22 +71,19 @@ class SchemaDumpController extends Controller
      */
     public function actionCreate($schema = '')
     {
-        $stdout = '';
-        $tables = $this->db->schema->getTableSchemas($schema);
-
         $offset = 0;
-        foreach ($tables as $table) {
+        $stdout = '';
+
+        foreach ($this->db->schema->getTableSchemas($schema) as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
-
             $stdout .= "// $table->name\n";
             $stdout .= "\$this->createTable('{{%$table->name}}', [\n";
 
             foreach ($table->columns as $column) {
                 $stdout .= "    '$column->name' => {$this->getSchemaType($column)} . \"{$this->otherDefinition($column)}\",\n";
             }
-
             if (!empty($table->primaryKey)) {
                 if (count($table->primaryKey) >= 2) {
                     $stdout .= "    'PRIMARY KEY (" . implode(', ', $table->primaryKey) . ")',\n";
@@ -95,15 +92,12 @@ class SchemaDumpController extends Controller
                     $stdout .= "    'PRIMARY KEY ({$table->primaryKey[0]})',\n";
                 }
             }
-
             $stdout .= "], \$this->tableOptions);\n\n";
             $offset = mb_strlen($stdout, Yii::$app->charset);
         }
-
-        foreach ($tables as $table) {
+        foreach ($this->db->schema->getTableSchemas($schema) as $table) {
             $stdout .= $this->generateForeignKey($table);
         }
-
         $this->stdout(strtr($stdout, [
             ' . ""' => '',
             '" . "' => '',
