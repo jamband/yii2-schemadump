@@ -176,7 +176,7 @@ class SchemaDumpController extends Controller
     private function type($type)
     {
         $class = new \ReflectionClass('yii\db\Schema');
-        return 'Schema::' . implode(array_keys($class->getConstants(), $type));
+        return $class->getShortName() . '::' . implode(array_keys($class->getConstants(), $type));
     }
 
     /**
