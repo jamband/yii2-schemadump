@@ -12,9 +12,9 @@
 namespace jamband\schemadump;
 
 use Yii;
-use yii\console\Exception;
 use yii\console\Controller;
 use yii\db\Connection;
+use yii\di\Instance;
 
 /**
  * Generate the migration code from database schema.
@@ -53,12 +53,7 @@ class SchemaDumpController extends Controller
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
-            if (is_string($this->db)) {
-                $this->db = Yii::$app->get($this->db);
-            }
-            if (!$this->db instanceof Connection) {
-                throw new Exception("The 'db' option must refer to the application component ID of a DB connection.");
-            }
+            $this->db = Instance::ensure($this->db, Connection::className());
             return true;
         }
         return false;
