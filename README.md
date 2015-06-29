@@ -21,7 +21,7 @@ or add in composer.json (require-dev section)
 
 ## Usage
 
-Add the following in config/console.php:
+Add the following in console/config/main.php:
 
 ```php
 <?php
