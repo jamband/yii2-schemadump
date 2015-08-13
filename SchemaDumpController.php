@@ -163,17 +163,19 @@ class SchemaDumpController extends Controller
      */
     private function getPrimaryKeyDefinition($pk, $stdout, $offset)
     {
-        // Composite primary keys
-        if (count($pk) >= 2) {
-            $compositePk = implode(', ', $pk);
-            return "    'PRIMARY KEY ($compositePk)',\n";
-        }
-        // Primary key not an auto-increment
-        if (
-            false === strpos($stdout, $this->type('pk'), $offset) &&
-            false === strpos($stdout, $this->type('bigpk'), $offset)
-        ) {
-            return "    'PRIMARY KEY ({$pk[0]})',\n";
+        if (!empty($pk)) {
+            // Composite primary keys
+            if (count($pk) >= 2) {
+                $compositePk = implode(', ', $pk);
+                return "    'PRIMARY KEY ($compositePk)',\n";
+            }
+            // Primary key not an auto-increment
+            if (
+                false === strpos($stdout, $this->type('pk'), $offset) &&
+                false === strpos($stdout, $this->type('bigpk'), $offset)
+            ) {
+                return "    'PRIMARY KEY ({$pk[0]})',\n";
+            }
         }
     }
 
