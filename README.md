@@ -6,7 +6,7 @@ This command to generate the schema from an existing database.
 
 ## Demo
 
-![gif](http://jamband.github.io/images/yii2-schemadump.gif)
+![gif](https://raw.githubusercontent.com/jamband/jamband.github.io/master/images/yii2-schemadump.gif)
 
 ## Installation
 
