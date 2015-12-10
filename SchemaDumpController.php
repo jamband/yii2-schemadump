@@ -240,12 +240,12 @@ class SchemaDumpController extends Controller
             $definition .= " DEFAULT $column->defaultValue";
 
         } elseif ($column->defaultValue !== null) {
-            $definition .= " DEFAULT '$column->defaultValue'";
+            $definition .= " DEFAULT '".addslashes($column->defaultValue)."'";
         }
 
         // comment
         if ($column->comment !== '') {
-            $definition .= " COMMENT '$column->comment'";
+            $definition .= " COMMENT '".addslashes($column->comment)."'";
         }
 
         return $definition;
