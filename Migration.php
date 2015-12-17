@@ -11,8 +11,6 @@
 
 namespace jamband\schemadump;
 
-use Yii;
-
 /**
  * Migration class file.
  */
@@ -30,7 +28,7 @@ class Migration extends \yii\db\Migration
     {
         parent::init();
 
-        if (Yii::$app->db->driverName === 'mysql') {
+        if ($this->db->driverName === 'mysql') {
             $this->tableOptions = 'ENGINE=InnoDB CHARACTER SET=utf8 COLLATE=utf8_unicode_ci';
         }
     }
