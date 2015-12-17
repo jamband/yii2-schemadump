@@ -53,16 +53,16 @@
         },
         {
             "name": "bower-asset/jquery.inputmask",
-            "version": "3.2.4",
+            "version": "3.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RobinHerbots/jquery.inputmask.git",
-                "reference": "4e39624ea093d23c34f340c5bd8ab4e3a0aea17d"
+                "reference": "d08264a678865849c808359d126e3bddb9ec87a6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RobinHerbots/jquery.inputmask/zipball/4e39624ea093d23c34f340c5bd8ab4e3a0aea17d",
-                "reference": "4e39624ea093d23c34f340c5bd8ab4e3a0aea17d",
+                "url": "https://api.github.com/repos/RobinHerbots/jquery.inputmask/zipball/d08264a678865849c808359d126e3bddb9ec87a6",
+                "reference": "d08264a678865849c808359d126e3bddb9ec87a6",
                 "shasum": ""
             },
             "require": {
@@ -131,12 +131,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/jquery-pjax.git",
-                "reference": "2273861523f8da3e58311520d83105179620f2dc"
+                "reference": "9c8ed9fa38442d619818185ccffb04f2988d0022"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/jquery-pjax/zipball/2273861523f8da3e58311520d83105179620f2dc",
-                "reference": "2273861523f8da3e58311520d83105179620f2dc",
+                "url": "https://api.github.com/repos/yiisoft/jquery-pjax/zipball/9c8ed9fa38442d619818185ccffb04f2988d0022",
+                "reference": "9c8ed9fa38442d619818185ccffb04f2988d0022",
                 "shasum": ""
             },
             "require": {
@@ -149,6 +149,7 @@
                     ".travis.yml",
                     "Gemfile",
                     "Gemfile.lock",
+                    "CONTRIBUTING.md",
                     "vendor/",
                     "script/",
                     "test/"
@@ -160,7 +161,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2015-11-19 22:24:48"
+            "time": "2015-12-05 12:06:24"
         },
         {
             "name": "cebe/markdown",
@@ -272,12 +273,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "fcf0b085a8c806fcaea9c7fd234440b7a2a3aab8"
+                "reference": "91554ec5166e709d24c9a21cccf731bfb841421b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/fcf0b085a8c806fcaea9c7fd234440b7a2a3aab8",
-                "reference": "fcf0b085a8c806fcaea9c7fd234440b7a2a3aab8",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/91554ec5166e709d24c9a21cccf731bfb841421b",
+                "reference": "91554ec5166e709d24c9a21cccf731bfb841421b",
                 "shasum": ""
             },
             "require": {
@@ -345,6 +346,11 @@
                     "name": "Paul Klimov",
                     "email": "klimov.paul@gmail.com",
                     "role": "Core framework development"
+                },
+                {
+                    "name": "Dmitry Naumenko",
+                    "email": "d.naumenko.a@gmail.com",
+                    "role": "Core framework development"
                 }
             ],
             "description": "Yii PHP Framework Version 2",
@@ -353,7 +359,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2015-11-22 16:05:09"
+            "time": "2015-12-17 05:13:41"
         },
         {
             "name": "yiisoft/yii2-composer",
@@ -361,12 +367,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-composer.git",
-                "reference": "87cd1f2e0dd454a837607de612b1057840effe8b"
+                "reference": "574dcb1d101ae55be230e0c00a2428af6ec4c5c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-composer/zipball/87cd1f2e0dd454a837607de612b1057840effe8b",
-                "reference": "87cd1f2e0dd454a837607de612b1057840effe8b",
+                "url": "https://api.github.com/repos/yiisoft/yii2-composer/zipball/574dcb1d101ae55be230e0c00a2428af6ec4c5c1",
+                "reference": "574dcb1d101ae55be230e0c00a2428af6ec4c5c1",
                 "shasum": ""
             },
             "require": {
@@ -400,7 +406,7 @@
                 "extension installer",
                 "yii2"
             ],
-            "time": "2015-09-25 10:48:24"
+            "time": "2015-12-01 20:06:03"
         }
     ],
     "packages-dev": [],
