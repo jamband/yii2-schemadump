@@ -24,7 +24,6 @@ or add in composer.json (require-dev section)
 Add the following in config/console.php:
 
 ```php
-<?php
 return [
     ...
     'components' => [
@@ -52,7 +51,7 @@ cd /path/to/project
 
 Example output:
 
-```
+```php
 // user
 $this->createTable('{{%user}}', [
     'id' => Schema::TYPE_PK . " COMMENT '主キー'",
