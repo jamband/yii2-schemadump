@@ -11,9 +11,11 @@
 
 namespace jamband\schemadump;
 
+use ReflectionClass;
 use Yii;
 use yii\console\Controller;
 use yii\db\Connection;
+use yii\db\Schema;
 use yii\di\Instance;
 
 /**
@@ -52,11 +54,11 @@ class SchemaDumpController extends Controller
      */
     public function beforeAction($action)
     {
-        if (parent::beforeAction($action)) {
-            $this->db = Instance::ensure($this->db, Connection::className());
-            return true;
+        if (!parent::beforeAction($action)) {
+            return false;
         }
-        return false;
+        $this->db = Instance::ensure($this->db, Connection::class);
+        return true;
     }
 
     /**
@@ -66,28 +68,20 @@ class SchemaDumpController extends Controller
      */
     public function actionCreate($schema = '')
     {
-        $offset = 0;
         $stdout = '';
-
-        foreach ($this->db->schema->getTableSchemas($schema) as $table) {
+        foreach ($this->getTableSchemas($schema) as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
-            $stdout .= "// $table->name\n";
-            $stdout .= "\$this->createTable('{{%$table->name}}', [\n";
-            $stdout .= $this->getColumnsDefinition($table->columns);
-            $stdout .= $this->getPrimaryKeyDefinition($table->primaryKey, $stdout, $offset);
-            $stdout .= "], \$this->tableOptions);\n\n";
-
-            $offset = mb_strlen($stdout, Yii::$app->charset);
+            $stdout .= static::generateCreateTable($table->name).
+                static::generateColumns($table->columns).
+                static::generatePrimaryKey($table->primaryKey, $table->columns).
+                static::generateTableOption();
         }
-        foreach ($this->db->schema->getTableSchemas($schema) as $table) {
-            $stdout .= $this->getForeignKeyDefinition($table);
+        foreach ($this->getTableSchemas($schema) as $table) {
+            $stdout .= $this->generateForeignKey($table);
         }
-        $this->stdout(strtr($stdout, [
-            ' . ""' => '',
-            '" . "' => '',
-        ]));
+        $this->stdout($stdout);
     }
 
     /**
@@ -98,8 +92,7 @@ class SchemaDumpController extends Controller
     public function actionDrop($schema = '')
     {
         $stdout = '';
-
-        foreach ($this->db->schema->getTableSchemas($schema) as $table) {
+        foreach ($this->getTableSchemas($schema) as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
@@ -110,7 +103,7 @@ class SchemaDumpController extends Controller
 
                 foreach ($table->foreignKeys as $fk) {
                     foreach ($fk as $k => $v) {
-                        if ($k === 0) {
+                        if (0 === $k) {
                             continue;
                         }
                         $stdout .= "$k, ";
@@ -124,59 +117,97 @@ class SchemaDumpController extends Controller
     }
 
     /**
-     * Returns the constant strings of yii\db\Schema class. e.g. Schema::TYPE_PK
-     * @param string $type the column type
+     * @param string $tableName
      * @return string
      */
-    private function type($type)
+    private static function generateCreateTable($tableName)
     {
-        $class = new \ReflectionClass('yii\db\Schema');
-        return $class->getShortName() . '::' . implode(array_keys($class->getConstants(), $type));
+        return sprintf("// %s\n", $tableName).
+            sprintf("\$this->createTable('{{%%%s}}', [\n", $tableName);
     }
+
 
     /**
      * Returns the columns definition.
      * @param array $columns
      * @return string
      */
-    private function getColumnsDefinition($columns)
+    private static function generateColumns(array $columns)
     {
         $definition = '';
-        $template = "    '<columnName>' => <schemaType> . \"<otherDefinition>\",\n";
-
         foreach ($columns as $column) {
-            $definition .= strtr($template, [
-                '<columnName>' => $column->name,
-                '<schemaType>' => $this->getSchemaType($column),
-                '<otherDefinition>' => $this->otherDefinition($column),
-            ]);
+            $definition .= sprintf("    '%s' => %s.\"%s\",\n",
+                $column->name, static::getSchemaType($column), static::other($column));
         }
-        return $definition;
+        return str_replace('.""', '', $definition);
     }
 
     /**
      * Returns the primary key definition.
      * @param array $pk
-     * @param string $stdout
-     * @param integer $offset
-     * @return string|null the primary key definition or null
+     * @param array $columns
+     * @return string the primary key definition or null
      */
-    private function getPrimaryKeyDefinition($pk, $stdout, $offset)
+    private static function generatePrimaryKey(array $pk, array $columns)
     {
-        if (!empty($pk)) {
-            // Composite primary keys
-            if (count($pk) >= 2) {
-                $compositePk = implode(', ', $pk);
-                return "    'PRIMARY KEY ($compositePk)',\n";
-            }
-            // Primary key not an auto-increment
-            if (
-                false === strpos($stdout, $this->type('pk'), $offset) &&
-                false === strpos($stdout, $this->type('bigpk'), $offset)
-            ) {
-                return "    'PRIMARY KEY ({$pk[0]})',\n";
+        if (empty($pk)) {
+            return '';
+        }
+        // Composite primary keys
+        if (2 <= count($pk)) {
+            $compositePk = implode(', ', $pk);
+            return "    'PRIMARY KEY ($compositePk)',\n";
+        }
+        // Primary key not an auto-increment
+        $flag = false;
+        foreach ($columns as $column) {
+            if ($column->autoIncrement && !$column->unsigned) {
+                $flag = true;
             }
         }
+        if (false === $flag) {
+            return sprintf("    'PRIMARY KEY (%s)',\n", $pk[0]);
+        }
+        return '';
+    }
+
+    /**
+     * @return string
+     */
+    private static function generateTableOption()
+    {
+        return "], \$this->tableOptions);\n\n";
+    }
+
+    /**
+     * Returns the foreign key definition.
+     * @param TableSchema[] $table
+     * @return string|null foreign key definition or null
+     */
+    private function generateForeignKey($table)
+    {
+        if (empty($table->foreignKeys)) {
+            return;
+        }
+        $definition = "// fk: $table->name\n";
+
+        foreach ($table->foreignKeys as $fk) {
+            $refTable = '';
+            $refColumns = '';
+            $columns = '';
+
+            foreach ($fk as $k => $v) {
+                if (0 === $k) {
+                    $refTable = $v;
+                } else {
+                    $columns = $k;
+                    $refColumns = $v;
+                }
+            }
+            $definition .= sprintf("\$this->addForeignKey('%s', '{{%%%s}}', '%s', '{{%%%s}}', '%s');\n",
+                'fk_'.$table->name.'_'.$columns, $table->name, $columns, $refTable, $refColumns);
+        }
+        return "$definition\n";
     }
 
     /**
@@ -184,19 +215,30 @@ class SchemaDumpController extends Controller
      * @param ColumnSchema[] $column
      * @return string the schema type
      */
-    private function getSchemaType($column)
+    private static function getSchemaType($column)
     {
         if ($column->autoIncrement && !$column->unsigned) {
-            return ($column->type === 'bigint') ? $this->type('bigpk') : $this->type('pk');
+            if ('bigint' === $column->type) {
+                return static::type('bigpk');
+            }
+            return static::type('pk');
         }
-        if ($column->dbType === 'tinyint(1)') {
-            return $this->type('boolean');
+        if ('tinyint(1)' === $column->dbType) {
+            return static::type('boolean');
         }
-        if ($column->enumValues !== null) {
-            return "\"$column->dbType\"";
+        if (null !== $column->enumValues) {
+            return "\$column->dbType\"";
         }
+        return static::type($column->type);
+    }
 
-        return $this->type($column->type);
+    /**
+     * @param string $schema
+     * @return array
+     */
+    private function getTableSchemas($schema)
+    {
+        return $this->db->schema->getTableSchemas($schema);
     }
 
     /**
@@ -204,18 +246,18 @@ class SchemaDumpController extends Controller
      * @param ColumnSchema[] $column
      * @return string the other definition
      */
-    private function otherDefinition($column)
+    private static function other($column)
     {
         $definition = '';
 
         // size
-        if ($column->scale !== null && $column->scale > 0) {
+        if (null !== $column->scale && 0 < $column->scale) {
             $definition .= "($column->precision,$column->scale)";
 
-        } elseif (
-            ($column->size !== null && !$column->autoIncrement && $column->dbType !== 'tinyint(1)') ||
-            ($column->size !== null && $column->unsigned)
-        ) {
+        } elseif (null !== $column->size && !$column->autoIncrement && 'tinyint(1)' !== $column->dbType) {
+            $definition .= "($column->size)";
+
+        } elseif (null !== $column->size && $column->unsigned) {
             $definition .= "($column->size)";
         }
 
@@ -239,12 +281,12 @@ class SchemaDumpController extends Controller
         if ($column->defaultValue instanceof \yii\db\Expression) {
             $definition .= " DEFAULT $column->defaultValue";
 
-        } elseif ($column->defaultValue !== null) {
+        } elseif (null !== $column->defaultValue) {
             $definition .= " DEFAULT '".addslashes($column->defaultValue)."'";
         }
 
         // comment
-        if ($column->comment !== '') {
+        if ('' !== $column->comment) {
             $definition .= " COMMENT '".addslashes($column->comment)."'";
         }
 
@@ -252,39 +294,13 @@ class SchemaDumpController extends Controller
     }
 
     /**
-     * Returns the foreign key definition.
-     * @param TableSchema[] $table
-     * @return string|null foreign key definition or null
+     * Returns the constant strings of yii\db\Schema class. e.g. Schema::TYPE_PK
+     * @param string $type the column type
+     * @return string
      */
-    private function getForeignKeyDefinition($table)
+    private static function type($type)
     {
-        if (empty($table->foreignKeys)) {
-            return;
-        }
-        $definition = "// fk: $table->name\n";
-
-        foreach ($table->foreignKeys as $fk) {
-            $refTable = '';
-            $refColumns = '';
-            $columns = '';
-
-            foreach ($fk as $k => $v) {
-                if ($k === 0) {
-                    $refTable = $v;
-                } else {
-                    $columns = $k;
-                    $refColumns = $v;
-                }
-            }
-            $template = "\$this->addForeignKey('<name>', '{{%<table>}}', '<columns>', '{{%<refTable>}}', '<refColumns>');\n";
-            $definition .= strtr($template, [
-                '<name>' => "fk_{$table->name}_{$columns}",
-                '<table>' => $table->name,
-                '<columns>' => $columns,
-                '<refTable>' => $refTable,
-                '<refColumns>' => $refColumns,
-            ]);
-        }
-        return "$definition\n";
+        $class = new ReflectionClass(Schema::class);
+        return $class->getShortName().'::'.implode(array_keys($class->getConstants(), $type));
     }
 }

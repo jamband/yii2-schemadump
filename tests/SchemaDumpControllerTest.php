@@ -47,18 +47,18 @@ class SchemaDumpControllerText extends \PHPUnit_Framework_TestCase
 // post
 $this->createTable('{{%post}}', [
     'id' => Schema::TYPE_PK,
-    'user_id' => Schema::TYPE_INTEGER . "(11) NOT NULL",
-    'title' => Schema::TYPE_STRING . "(255) NOT NULL",
-    'body' => Schema::TYPE_TEXT . " NOT NULL",
-    'created_at' => Schema::TYPE_INTEGER . "(11) NOT NULL",
-    'updated_at' => Schema::TYPE_INTEGER . "(11) NOT NULL",
+    'user_id' => Schema::TYPE_INTEGER."(11) NOT NULL",
+    'title' => Schema::TYPE_STRING."(255) NOT NULL",
+    'body' => Schema::TYPE_TEXT." NOT NULL",
+    'created_at' => Schema::TYPE_INTEGER."(11) NOT NULL",
+    'updated_at' => Schema::TYPE_INTEGER."(11) NOT NULL",
 ], $this->tableOptions);
 
 // user
 $this->createTable('{{%user}}', [
-    'id' => Schema::TYPE_PK . " COMMENT '主キー'",
-    'username' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'ユーザ名'",
-    'password' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'パスワード'",
+    'id' => Schema::TYPE_PK." COMMENT '主キー'",
+    'username' => Schema::TYPE_STRING."(255) NOT NULL COMMENT 'ユーザ名'",
+    'password' => Schema::TYPE_STRING."(255) NOT NULL COMMENT 'パスワード'",
 ], $this->tableOptions);
 
 
