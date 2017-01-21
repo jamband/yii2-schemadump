@@ -1,56 +1,91 @@
 <?php
 
-namespace jamband\schemadump\tests;
+namespace tests;
 
 use Yii;
+use yii\db\Connection;
 use jamband\schemadump\SchemaDumpController;
-use jamband\schemadump\tests\StdOutBufferControllerTrait;
-use jamband\schemadump\tests\DatabaseOperationsTrait;
 
-class SchemaDumpControllerTest extends TestCase
+class SchemaDumpControllerText extends \PHPUnit_Framework_TestCase
 {
     private $controller;
 
-    protected function setUp()
+    public function setUp()
     {
-        parent::setUp();
+        $this->controller = new BufferedSchemaDumpController('schemadump', Yii::$app);
+    }
 
-        $this->mockApplication([
-            'components' => [
-                'db' => [
-                    'class' => 'yii\db\Connection',
-                    'dsn' => 'sqlite::memory:',
-                ],
-            ],
+    public static function setUpBeforeClass()
+    {
+        Yii::$app->set('db', [
+            'class' => Connection::class,
+            'dsn' => 'mysql:host=localhost;dbname=yii2_schemadump_test',
+            'username' => 'root',
+            'password' => getenv('DB_PASS'),
         ]);
 
-        $module = $this->getMock('yii\\base\\Module', ['fake'], ['console']);
-        $this->controller = new SchemaDumpControllerMock('schemadump', $module);
+        Yii::$app->db->open();
+
+        $statements = array_filter(explode(';', file_get_contents(__DIR__.'/mysql.sql')), 'trim');
+        foreach ($statements as $statement) {
+            Yii::$app->db->pdo->exec($statement);
+        }
+    }
+
+    public static function tearDownAfterClass()
+    {
+        $db = Yii::$app->db;
+        foreach ($db->schema->getTableNames() as $table) {
+            $db->createCommand("DROP TABLE `$table`")->execute();
+        }
     }
 
     public function testActionCreate()
     {
-    }
+        $this->controller->run('create');
+        $this->assertSame(<<<'STDOUT'
+// post
+$this->createTable('{{%post}}', [
+    'id' => Schema::TYPE_PK,
+    'user_id' => Schema::TYPE_INTEGER . "(11) NOT NULL",
+    'title' => Schema::TYPE_STRING . "(255) NOT NULL",
+    'body' => Schema::TYPE_TEXT . " NOT NULL",
+    'created_at' => Schema::TYPE_INTEGER . "(11) NOT NULL",
+    'updated_at' => Schema::TYPE_INTEGER . "(11) NOT NULL",
+], $this->tableOptions);
 
-    public function testActionDrop()
-    {
-    }
+// user
+$this->createTable('{{%user}}', [
+    'id' => Schema::TYPE_PK . " COMMENT '主キー'",
+    'username' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'ユーザ名'",
+    'password' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'パスワード'",
+], $this->tableOptions);
 
-     /**
-     * Emulates running of the schemadump controller action.
-     * @param string $actionID id of action to be run.
-     * @param array  $args action arguments.
-     * @return string command output.
-     */
-    private function runAction($actionID, array $args = [])
-    {
-        $this->controller->run($actionID, $args);
-        return $this->controller->flushStdOutBuffer();
+
+STDOUT
+        , $this->controller->flushStdOutBuffer());
     }
 }
 
-class SchemaDumpControllerMock extends SchemaDumpController
+class BufferedSchemaDumpController extends SchemaDumpController
 {
-    use StdOutBufferControllerTrait;
-    use DatabaseOperationsTrait;
+    private $stdOutBuffer = '';
+
+    /**
+     * @param string $string
+     */
+    public function stdout($string)
+    {
+        $this->stdOutBuffer .= $string;
+    }
+
+    /**
+     * @return string
+     */
+    public function flushStdOutBuffer()
+    {
+        $result = $this->stdOutBuffer;
+        $this->stdOutBuffer = '';
+        return $result;
+    }
 }

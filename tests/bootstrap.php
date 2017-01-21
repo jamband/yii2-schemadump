@@ -1,12 +1,12 @@
 <?php
 
-error_reporting(-1);
+defined('YII_DEBUG') or define('YII_DEBUG', true);
+defined('YII_ENV') or define('YII_ENV', 'test');
 
-define('YII_ENABLE_ERROR_HANDLER', false);
-define('YII_DEBUG', true);
+require __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../vendor/yiisoft/yii2/Yii.php';
 
-$_SERVER['SCRIPT_NAME'] = '/' . __DIR__;
-$_SERVER['SCRIPT_FILENAME'] = __FILE__;
-
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../vendor/yiisoft/yii2/Yii.php';
+new yii\console\Application([
+    'id' => 'unit',
+    'basePath' => __DIR__,
+]);
