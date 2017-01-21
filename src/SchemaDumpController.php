@@ -146,7 +146,7 @@ class SchemaDumpController extends Controller
      * Returns the primary key definition.
      * @param array $pk
      * @param array $columns
-     * @return string the primary key definition or null
+     * @return string the primary key definition
      */
     private static function generatePrimaryKey(array $pk, array $columns)
     {
