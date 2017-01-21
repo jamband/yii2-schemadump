@@ -211,6 +211,15 @@ class SchemaDumpController extends Controller
     }
 
     /**
+     * @param string $schema
+     * @return array
+     */
+    private function getTableSchemas($schema)
+    {
+        return $this->db->schema->getTableSchemas($schema);
+    }
+
+    /**
      * Returns the schema type.
      * @param ColumnSchema[] $column
      * @return string the schema type
@@ -230,15 +239,6 @@ class SchemaDumpController extends Controller
             return "\$column->dbType\"";
         }
         return static::type($column->type);
-    }
-
-    /**
-     * @param string $schema
-     * @return array
-     */
-    private function getTableSchemas($schema)
-    {
-        return $this->db->schema->getTableSchemas($schema);
     }
 
     /**
