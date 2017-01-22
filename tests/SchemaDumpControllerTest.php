@@ -70,6 +70,9 @@ $this->createTable('{{%user}}', [
     'password' => Schema::TYPE_STRING."(255) NOT NULL COMMENT 'パスワード'",
 ], $this->tableOptions);
 
+// fk: post
+$this->addForeignKey('fk_post_user_id', '{{%post}}', 'user_id', '{{%user}}', 'id');
+
 
 STDOUT
         , $this->controller->flushStdOutBuffer());
