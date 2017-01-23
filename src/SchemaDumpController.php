@@ -11,11 +11,12 @@
 
 namespace jamband\schemadump;
 
-use ReflectionClass;
 use Yii;
 use yii\console\Controller;
 use yii\db\Connection;
+use yii\db\Expression;
 use yii\db\Schema;
+use yii\db\TableSchema;
 use yii\di\Instance;
 
 /**
@@ -74,9 +75,9 @@ class SchemaDumpController extends Controller
                 continue;
             }
             $stdout .= static::generateCreateTable($table->name).
-                static::generateColumns($table->columns).
+                static::generateColumns($table->columns, $this->db->schema->findUniqueIndexes($table)).
                 static::generatePrimaryKey($table->primaryKey, $table->columns).
-                static::generateTableOption();
+                static::generateTableOptions();
         }
         foreach ($this->getTableSchemas($schema) as $table) {
             $stdout .= $this->generateForeignKey($table);
@@ -96,10 +97,9 @@ class SchemaDumpController extends Controller
             if ($table->name === $this->migrationTable) {
                 continue;
             }
-            $stdout .= "\$this->dropTable('{{%$table->name}}');";
-
+            $stdout .= static::generateDropTable($table->name);
             if (!empty($table->foreignKeys)) {
-                $stdout .= " // fk: ";
+                $stdout .= ' // fk: ';
 
                 foreach ($table->foreignKeys as $fk) {
                     foreach ($fk as $k => $v) {
@@ -117,29 +117,30 @@ class SchemaDumpController extends Controller
     }
 
     /**
-     * @param string $tableName
+     * @param string $name
      * @return string
      */
-    private static function generateCreateTable($tableName)
+    private static function generateCreateTable($name)
     {
-        return sprintf("// %s\n", $tableName).
-            sprintf("\$this->createTable('{{%%%s}}', [\n", $tableName);
+        return sprintf("// %s\n", $name).
+            sprintf("\$this->createTable('{{%%%s}}', [\n", $name);
     }
 
 
     /**
      * Returns the columns definition.
      * @param array $columns
+     * @param array $unique unique indexes
      * @return string
      */
-    private static function generateColumns(array $columns)
+    private static function generateColumns(array $columns, array $unique)
     {
         $definition = '';
         foreach ($columns as $column) {
-            $definition .= sprintf("    '%s' => %s.\"%s\",\n",
-                $column->name, static::getSchemaType($column), static::other($column));
+            $definition .= sprintf("    '%s' => \$this->%s%s,\n",
+                $column->name, static::getSchemaType($column), static::other($column, $unique));
         }
-        return str_replace('.""', '', $definition);
+        return $definition;
     }
 
     /**
@@ -161,7 +162,7 @@ class SchemaDumpController extends Controller
         // Primary key not an auto-increment
         $flag = false;
         foreach ($columns as $column) {
-            if ($column->autoIncrement && !$column->unsigned) {
+            if ($column->autoIncrement) {
                 $flag = true;
             }
         }
@@ -174,7 +175,7 @@ class SchemaDumpController extends Controller
     /**
      * @return string
      */
-    private static function generateTableOption()
+    private static function generateTableOptions()
     {
         return "], \$this->tableOptions);\n\n";
     }
@@ -211,6 +212,15 @@ class SchemaDumpController extends Controller
     }
 
     /**
+     * @param string $name
+     * @return string
+     */
+    private static function generateDropTable($name)
+    {
+        return "\$this->dropTable('{{%$name}}');";
+    }
+
+    /**
      * @param string $schema
      * @return array
      */
@@ -226,27 +236,33 @@ class SchemaDumpController extends Controller
      */
     private static function getSchemaType($column)
     {
-        if ($column->autoIncrement && !$column->unsigned) {
+        if ($column->isPrimaryKey && $column->autoIncrement) {
             if ('bigint' === $column->type) {
-                return static::type('bigpk');
+                return 'bigPrimaryKey()';
             }
-            return static::type('pk');
+            return 'primaryKey()';
         }
         if ('tinyint(1)' === $column->dbType) {
-            return static::type('boolean');
+            return 'boolean()';
         }
         if (null !== $column->enumValues) {
-            return "\$column->dbType\"";
+            // https://github.com/yiisoft/yii2/issues/9797
+            $enumValues = array_map('addslashes', $column->enumValues);
+            return "enum(['".implode('\', \'', $enumValues)."'])";
         }
-        return static::type($column->type);
+        if (null === $column->size) {
+            return $column->type.'()';
+        }
+        return $column->type;
     }
 
     /**
      * Returns the other definition.
      * @param ColumnSchema[] $column
+     * @param array $unique
      * @return string the other definition
      */
-    private static function other($column)
+    private static function other($column, array $unique)
     {
         $definition = '';
 
@@ -257,50 +273,46 @@ class SchemaDumpController extends Controller
         } elseif (null !== $column->size && !$column->autoIncrement && 'tinyint(1)' !== $column->dbType) {
             $definition .= "($column->size)";
 
-        } elseif (null !== $column->size && $column->unsigned) {
+        } elseif (null !== $column->size && !$column->isPrimaryKey && $column->unsigned) {
             $definition .= "($column->size)";
         }
 
         // unsigned
         if ($column->unsigned) {
-            $definition .= ' UNSIGNED';
+            $definition .= '->unsigned()';
         }
 
-        // null, auto-increment
+        // null
         if ($column->allowNull) {
-            $definition .= ' NULL';
+            $definition .= '->null()';
 
         } elseif (!$column->autoIncrement) {
-            $definition .= ' NOT NULL';
+            $definition .= '->notNull()';
+        }
 
-        } elseif ($column->autoIncrement && $column->unsigned) {
-            $definition .= ' NOT NULL AUTO_INCREMENT';
+        // unique key
+        if (!empty($unique) && !$column->isPrimaryKey) {
+            $definition .= '->unique()';
         }
 
         // default value
-        if ($column->defaultValue instanceof \yii\db\Expression) {
-            $definition .= " DEFAULT $column->defaultValue";
+        if ($column->defaultValue instanceof Expression) {
+            $definition .= "->defaultValue('$column->defaultValue')";
 
-        } elseif (null !== $column->defaultValue) {
-            $definition .= " DEFAULT '".addslashes($column->defaultValue)."'";
+        } elseif (null !== $column->defaultValue && is_int($column->defaultValue)) {
+            $definition .= '->defaultValue('.addslashes($column->defaultValue).')';
+
+        } elseif (null !== $column->defaultValue && is_string($column->defaultValue)) {
+            $definition .= '->defaultValue(\''.addslashes($column->defaultValue).'\')';
         }
 
         // comment
         if ('' !== $column->comment) {
-            $definition .= " COMMENT '".addslashes($column->comment)."'";
+            $definition .= '->comment(\''.addslashes($column->comment).'\')';
         }
 
-        return $definition;
-    }
+        // append
 
-    /**
-     * Returns the constant strings of yii\db\Schema class. e.g. Schema::TYPE_PK
-     * @param string $type the column type
-     * @return string
-     */
-    private static function type($type)
-    {
-        $class = new ReflectionClass(Schema::class);
-        return $class->getShortName().'::'.implode(array_keys($class->getConstants(), $type));
+        return $definition;
     }
 }

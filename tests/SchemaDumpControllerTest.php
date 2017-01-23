@@ -56,82 +56,89 @@ class SchemaDumpControllerText extends \PHPUnit_Framework_TestCase
         $this->assertSame(<<<'STDOUT'
 // 0010_pk_ai
 $this->createTable('{{%0010_pk_ai}}', [
-    'id' => Schema::TYPE_PK,
+    'id' => $this->primaryKey(),
 ], $this->tableOptions);
 
 // 0020_pk_not_ai
 $this->createTable('{{%0020_pk_not_ai}}', [
-    'id' => Schema::TYPE_INTEGER."(11) NOT NULL",
+    'id' => $this->integer(11)->notNull(),
     'PRIMARY KEY (id)',
 ], $this->tableOptions);
 
 // 0030_pk_bigint_ai
 $this->createTable('{{%0030_pk_bigint_ai}}', [
-    'id' => Schema::TYPE_BIGPK,
+    'id' => $this->bigPrimaryKey(),
 ], $this->tableOptions);
 
 // 0040_pk_unsigned_ai
 $this->createTable('{{%0040_pk_unsigned_ai}}', [
-    'id' => Schema::TYPE_INTEGER."(10) UNSIGNED NOT NULL AUTO_INCREMENT",
-    'PRIMARY KEY (id)',
+    'id' => $this->primaryKey()->unsigned(),
 ], $this->tableOptions);
 
 // 0050_pk_bigint_unsigned_ai
 $this->createTable('{{%0050_pk_bigint_unsigned_ai}}', [
-    'id' => Schema::TYPE_BIGINT."(20) UNSIGNED NOT NULL AUTO_INCREMENT",
-    'PRIMARY KEY (id)',
+    'id' => $this->bigPrimaryKey()->unsigned(),
 ], $this->tableOptions);
 
 // 0060_composite_pks
 $this->createTable('{{%0060_composite_pks}}', [
-    'foo_id' => Schema::TYPE_INTEGER."(11) NOT NULL",
-    'bar_id' => Schema::TYPE_INTEGER."(11) NOT NULL",
+    'foo_id' => $this->integer(11)->notNull(),
+    'bar_id' => $this->integer(11)->notNull(),
     'PRIMARY KEY (foo_id, bar_id)',
+], $this->tableOptions);
+
+// 0070_uks
+$this->createTable('{{%0070_uks}}', [
+    'id' => $this->primaryKey(),
+    'username' => $this->string(20)->notNull()->unique(),
+    'email' => $this->string(255)->notNull()->unique(),
 ], $this->tableOptions);
 
 // 0100_types
 $this->createTable('{{%0100_types}}', [
-    'char' => Schema::TYPE_CHAR."(20) NOT NULL",
-    'varchar' => Schema::TYPE_STRING."(20) NOT NULL",
-    'text' => Schema::TYPE_TEXT." NOT NULL",
-    'smallint' => Schema::TYPE_SMALLINT."(6) NOT NULL",
-    'integer' => Schema::TYPE_INTEGER."(11) NOT NULL",
-    'bigint' => Schema::TYPE_BIGINT."(20) NOT NULL",
-    'float' => Schema::TYPE_FLOAT." NOT NULL",
-    'float_decimal' => Schema::TYPE_FLOAT."(20,10) NOT NULL",
-    'double' => Schema::TYPE_DOUBLE."(20,10) NOT NULL",
-    'decimal' => Schema::TYPE_DECIMAL."(20,10) NOT NULL",
-    'money' => Schema::TYPE_DECIMAL."(19,4) NOT NULL",
-    'datetime' => Schema::TYPE_DATETIME." NOT NULL",
-    'timestamp' => Schema::TYPE_TIMESTAMP." NOT NULL DEFAULT CURRENT_TIMESTAMP",
-    'time' => Schema::TYPE_TIME." NOT NULL",
-    'date' => Schema::TYPE_DATE." NOT NULL",
-    'binary' => Schema::TYPE_BINARY." NOT NULL",
-    'boolean' => Schema::TYPE_BOOLEAN." NOT NULL DEFAULT '0'",
-    'tinyint_1' => Schema::TYPE_BOOLEAN." NOT NULL DEFAULT '0'",
+    'char' => $this->char(20)->notNull(),
+    'varchar' => $this->string(20)->notNull(),
+    'text' => $this->text()->notNull(),
+    'smallint' => $this->smallint(6)->notNull(),
+    'integer' => $this->integer(11)->notNull(),
+    'bigint' => $this->bigint(20)->notNull(),
+    'float' => $this->float()->notNull(),
+    'float_decimal' => $this->float(20,10)->notNull(),
+    'double' => $this->double(20,10)->notNull(),
+    'decimal' => $this->decimal(20,10)->notNull(),
+    'money' => $this->decimal(19,4)->notNull(),
+    'datetime' => $this->datetime()->notNull(),
+    'timestamp' => $this->timestamp()->notNull()->defaultValue('CURRENT_TIMESTAMP'),
+    'time' => $this->time()->notNull(),
+    'date' => $this->date()->notNull(),
+    'binary' => $this->binary()->notNull(),
+    'boolean' => $this->boolean()->notNull()->defaultValue(0),
+    'tinyint_1' => $this->boolean()->notNull()->defaultValue(0),
 ], $this->tableOptions);
 
 // 0200_default_values
 $this->createTable('{{%0200_default_values}}', [
-    'string' => Schema::TYPE_STRING."(255) NOT NULL DEFAULT 'UNKNOWN'",
-    'special_characters' => Schema::TYPE_STRING."(255) NOT NULL DEFAULT '\'\"'",
+    'integer' => $this->smallint(6)->notNull()->defaultValue(1),
+    'string' => $this->string(255)->notNull()->defaultValue('UNKNOWN'),
+    'special_characters' => $this->string(255)->notNull()->defaultValue('\'\"'),
+    'size' => $this->enum(['foo', 'bar', 'baz'])->notNull(),
 ], $this->tableOptions);
 
 // 0300_comment
 $this->createTable('{{%0300_comment}}', [
-    'username' => Schema::TYPE_STRING."(20) NOT NULL COMMENT 'ユーザ名'",
-    'special_characters' => Schema::TYPE_STRING."(20) NOT NULL COMMENT '\'\"'",
+    'username' => $this->string(20)->notNull()->comment('ユーザ名'),
+    'special_characters' => $this->string(20)->notNull()->comment('\'\"'),
 ], $this->tableOptions);
 
 // 0400_fk_parent
 $this->createTable('{{%0400_fk_parent}}', [
-    'id' => Schema::TYPE_PK,
+    'id' => $this->primaryKey(),
 ], $this->tableOptions);
 
 // 0410_fk_child
 $this->createTable('{{%0410_fk_child}}', [
-    'id' => Schema::TYPE_PK,
-    'parent_id' => Schema::TYPE_INTEGER."(11) NOT NULL",
+    'id' => $this->primaryKey(),
+    'parent_id' => $this->integer(11)->notNull(),
 ], $this->tableOptions);
 
 // fk: 0410_fk_child
@@ -152,6 +159,7 @@ $this->dropTable('{{%0030_pk_bigint_ai}}');
 $this->dropTable('{{%0040_pk_unsigned_ai}}');
 $this->dropTable('{{%0050_pk_bigint_unsigned_ai}}');
 $this->dropTable('{{%0060_composite_pks}}');
+$this->dropTable('{{%0070_uks}}');
 $this->dropTable('{{%0100_types}}');
 $this->dropTable('{{%0200_default_values}}');
 $this->dropTable('{{%0300_comment}}');

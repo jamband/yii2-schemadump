@@ -1,4 +1,4 @@
--- for some primary keys
+-- for some primary keys and unique keys
 DROP TABLE IF EXISTS `0010_pk_ai`;
 CREATE TABLE `0010_pk_ai` (
     `id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -30,6 +30,14 @@ CREATE TABLE `0060_composite_pks` (
     `bar_id` INT(11) NOT NULL,
     PRIMARY KEY (`foo_id`, `bar_id`)
 );
+DROP TABLE IF EXISTS `0070_uks`;
+CREATE TABLE `0070_uks` (
+    `id` INT(11) NOT NULL AUTO_INCREMENT,
+    `username` VARCHAR(20) NOT NULL,
+    `email` VARCHAR(255) NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uks` (`username`, `email`)
+);
 
 -- for some types
 DROP TABLE IF EXISTS `0100_types`;
@@ -57,8 +65,10 @@ CREATE TABLE `0100_types` (
 -- for some default values
 DROP TABLE IF EXISTS `0200_default_values`;
 CREATE TABLE `0200_default_values` (
+    `integer` SMALLINT(6) NOT NULL DEFAULT 1,
     `string` VARCHAR(255) NOT NULL DEFAULT 'UNKNOWN',
-    `special_characters` VARCHAR(255) NOT NULL DEFAULT '\'"'
+    `special_characters` VARCHAR(255) NOT NULL DEFAULT '\'"',
+    `size` ENUM('foo', 'bar', 'baz') NOT NULL
 );
 
 -- for some comments
