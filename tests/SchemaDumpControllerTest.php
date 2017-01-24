@@ -99,7 +99,7 @@ $this->createTable('{{%0100_types}}', [
     'char' => $this->char(20)->notNull(),
     'varchar' => $this->string(20)->notNull(),
     'text' => $this->text()->notNull(),
-    'smallint' => $this->smallint(6)->notNull(),
+    'smallint' => $this->smallInteger(6)->notNull(),
     'integer' => $this->integer(11)->notNull(),
     'bigint' => $this->bigint(20)->notNull(),
     'float' => $this->float()->notNull(),
@@ -118,7 +118,7 @@ $this->createTable('{{%0100_types}}', [
 
 // 0200_default_values
 $this->createTable('{{%0200_default_values}}', [
-    'integer' => $this->smallint(6)->notNull()->defaultValue(1),
+    'integer' => $this->smallInteger(6)->notNull()->defaultValue(1),
     'string' => $this->string(255)->notNull()->defaultValue('UNKNOWN'),
     'special_characters' => $this->string(255)->notNull()->defaultValue('\'\"'),
     'size' => $this->enum(['foo', 'bar', 'baz'])->notNull(),

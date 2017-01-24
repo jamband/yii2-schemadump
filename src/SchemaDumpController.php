@@ -245,6 +245,9 @@ class SchemaDumpController extends Controller
         if ('tinyint(1)' === $column->dbType) {
             return 'boolean()';
         }
+        if ('smallint' === $column->type) {
+            return 'smallInteger';
+        }
         if (null !== $column->enumValues) {
             // https://github.com/yiisoft/yii2/issues/9797
             $enumValues = array_map('addslashes', $column->enumValues);
