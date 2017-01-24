@@ -311,15 +311,15 @@ class SchemaDumpController extends Controller
             $definition .= "->defaultExpression('$column->defaultValue')";
 
         } elseif (null !== $column->defaultValue && is_int($column->defaultValue)) {
-            $definition .= '->defaultValue('.addslashes($column->defaultValue).')';
+            $definition .= "->defaultValue($column->defaultValue)";
 
         } elseif (null !== $column->defaultValue && is_string($column->defaultValue)) {
-            $definition .= '->defaultValue(\''.addslashes($column->defaultValue).'\')';
+            $definition .= "->defaultValue('".addslashes($column->defaultValue)."')";
         }
 
         // comment
         if ('' !== $column->comment) {
-            $definition .= '->comment(\''.addslashes($column->comment).'\')';
+            $definition .= "->comment('".addslashes($column->comment)."')";
         }
 
         // append
