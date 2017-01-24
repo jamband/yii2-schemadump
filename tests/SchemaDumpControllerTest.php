@@ -101,7 +101,7 @@ $this->createTable('{{%0100_types}}', [
     'text' => $this->text()->notNull(),
     'smallint' => $this->smallInteger(6)->notNull(),
     'integer' => $this->integer(11)->notNull(),
-    'bigint' => $this->bigint(20)->notNull(),
+    'bigint' => $this->bigInteger(20)->notNull(),
     'float' => $this->float()->notNull(),
     'float_decimal' => $this->float(20,10)->notNull(),
     'double' => $this->double(20,10)->notNull(),
