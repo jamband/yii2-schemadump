@@ -303,7 +303,7 @@ class SchemaDumpController extends Controller
 
         // default value
         if ($column->defaultValue instanceof Expression) {
-            $definition .= "->defaultValue('$column->defaultValue')";
+            $definition .= "->defaultExpression('$column->defaultValue')";
 
         } elseif (null !== $column->defaultValue && is_int($column->defaultValue)) {
             $definition .= '->defaultValue('.addslashes($column->defaultValue).')';

@@ -108,7 +108,7 @@ $this->createTable('{{%0100_types}}', [
     'decimal' => $this->decimal(20,10)->notNull(),
     'money' => $this->decimal(19,4)->notNull(),
     'datetime' => $this->datetime()->notNull(),
-    'timestamp' => $this->timestamp()->notNull()->defaultValue('CURRENT_TIMESTAMP'),
+    'timestamp' => $this->timestamp()->notNull()->defaultExpression('CURRENT_TIMESTAMP'),
     'time' => $this->time()->notNull(),
     'date' => $this->date()->notNull(),
     'binary' => $this->binary()->notNull(),
