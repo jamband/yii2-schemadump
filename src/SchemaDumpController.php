@@ -137,8 +137,13 @@ class SchemaDumpController extends Controller
     {
         $definition = '';
         foreach ($columns as $column) {
-            $definition .= sprintf("    '%s' => \$this->%s%s,\n",
+            $tmp = sprintf("    '%s' => \$this->%s%s,\n",
                 $column->name, static::getSchemaType($column), static::other($column, $unique));
+
+            if (null !== $column->enumValues) {
+                $tmp = static::replaceEnumColumn($tmp);
+            }
+            $definition .= $tmp;
         }
         return $definition;
     }
@@ -320,5 +325,22 @@ class SchemaDumpController extends Controller
         // append
 
         return $definition;
+    }
+
+    /**
+     * @param string $tmp temporary definition
+     * @return string
+     */
+    private static function replaceEnumColumn($tmp)
+    {
+        return preg_replace("/,\n/", "\",\n", strtr($tmp, [
+            '()' => '',
+            '])' => ')',
+            '),' => ',',
+            '$this->enum([' => '"ENUM (',
+            '->notNull' => ' NOT NULL',
+            '->null' => ' DEFAULT NULL',
+            '->comment(' => ' COMMENT ',
+        ]));
     }
 }

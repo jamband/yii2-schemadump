@@ -59,7 +59,8 @@ CREATE TABLE `0100_types` (
     `date` DATE NOT NULL,
     `binary` BLOB NOT NULL,
     `boolean` BOOLEAN NOT NULL DEFAULT 0,
-    `tinyint_1` TINYINT(1) NOT NULL DEFAULT 0
+    `tinyint_1` TINYINT(1) NOT NULL DEFAULT 0,
+    `enum` ENUM('foo', 'bar', 'baz') NOT NULL
 );
 
 -- for some default values
@@ -68,14 +69,15 @@ CREATE TABLE `0200_default_values` (
     `integer` SMALLINT(6) NOT NULL DEFAULT 1,
     `string` VARCHAR(255) NOT NULL DEFAULT 'UNKNOWN',
     `special_characters` VARCHAR(255) NOT NULL DEFAULT '\'"',
-    `size` ENUM('foo', 'bar', 'baz') NOT NULL
+    `enum` ENUM ('foo', 'bar', 'baz') DEFAULT NULL
 );
 
 -- for some comments
 DROP TABLE IF EXISTS `0300_comment`;
 CREATE TABLE `0300_comment` (
     `username` VARCHAR(20) NOT NULL COMMENT 'ユーザ名',
-    `special_characters` VARCHAR(20) NOT NULL COMMENT '\'"'
+    `special_characters` VARCHAR(20) NOT NULL COMMENT '\'"',
+    `enum` ENUM('foo', 'bar', 'baz') NOT NULL COMMENT 'foo'
 );
 
 -- for foreign keys

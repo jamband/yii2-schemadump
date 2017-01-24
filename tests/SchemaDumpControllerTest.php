@@ -114,6 +114,7 @@ $this->createTable('{{%0100_types}}', [
     'binary' => $this->binary()->notNull(),
     'boolean' => $this->boolean()->notNull()->defaultValue(0),
     'tinyint_1' => $this->boolean()->notNull()->defaultValue(0),
+    'enum' => "ENUM ('foo', 'bar', 'baz') NOT NULL",
 ], $this->tableOptions);
 
 // 0200_default_values
@@ -121,13 +122,14 @@ $this->createTable('{{%0200_default_values}}', [
     'integer' => $this->smallInteger(6)->notNull()->defaultValue(1),
     'string' => $this->string(255)->notNull()->defaultValue('UNKNOWN'),
     'special_characters' => $this->string(255)->notNull()->defaultValue('\'\"'),
-    'size' => $this->enum(['foo', 'bar', 'baz'])->notNull(),
+    'enum' => "ENUM ('foo', 'bar', 'baz') DEFAULT NULL",
 ], $this->tableOptions);
 
 // 0300_comment
 $this->createTable('{{%0300_comment}}', [
     'username' => $this->string(20)->notNull()->comment('ユーザ名'),
     'special_characters' => $this->string(20)->notNull()->comment('\'\"'),
+    'enum' => "ENUM ('foo', 'bar', 'baz') NOT NULL COMMENT 'foo'",
 ], $this->tableOptions);
 
 // 0400_fk_parent
