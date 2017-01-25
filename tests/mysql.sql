@@ -68,7 +68,6 @@ DROP TABLE IF EXISTS `0200_default_values`;
 CREATE TABLE `0200_default_values` (
     `integer` SMALLINT(6) NOT NULL DEFAULT 1,
     `string` VARCHAR(255) NOT NULL DEFAULT 'UNKNOWN',
-    `special_characters` VARCHAR(255) NOT NULL DEFAULT '\'"',
     `enum` ENUM ('foo', 'bar', 'baz') DEFAULT NULL
 );
 
@@ -76,7 +75,6 @@ CREATE TABLE `0200_default_values` (
 DROP TABLE IF EXISTS `0300_comment`;
 CREATE TABLE `0300_comment` (
     `username` VARCHAR(20) NOT NULL COMMENT 'ユーザ名',
-    `special_characters` VARCHAR(20) NOT NULL COMMENT '\'"',
     `enum` ENUM('foo', 'bar', 'baz') NOT NULL COMMENT 'foo'
 );
 
