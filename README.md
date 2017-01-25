@@ -78,7 +78,7 @@ Generates the 'dropTable' code.
 ./yii schemadump/drop <existing_database_name>
 ```
 
-Useful commands (for OS X user):
+Useful commands (for macOS user):
 
 ```
 ./yii schemadump <existing_database_name> | pbcopy
