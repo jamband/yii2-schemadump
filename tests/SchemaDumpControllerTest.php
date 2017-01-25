@@ -44,8 +44,9 @@ class SchemaDumpControllerText extends \PHPUnit_Framework_TestCase
     public static function tearDownAfterClass()
     {
         $db = Yii::$app->db;
+        $db->createCommand()->checkIntegrity(false)->execute();
+
         foreach ($db->schema->getTableNames() as $table) {
-            $db->createCommand()->checkIntegrity(false)->execute();
             $db->createCommand("DROP TABLE `$table`")->execute();
         }
     }
