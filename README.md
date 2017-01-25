@@ -54,10 +54,10 @@ Example output:
 ```php
 // user
 $this->createTable('{{%user}}', [
-    'id' => Schema::TYPE_PK . " COMMENT '主キー'",
-    'username' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'ユーザ名'",
-    'email' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'メールアドレス'",
-    'password' => Schema::TYPE_STRING . "(255) NOT NULL COMMENT 'パスワード'",
+    'id' => $this->primaryKey()->comment('主キー'),
+    'username' => $this->string(20)->notNull()->unique()->comment('ユーザ名'),
+    'email' => $this->string(255)->notNull()->unique()->comemnt('メールアドレス'),
+    'password' => $this->string(255)->notNull()->comment('パスワード'),
 ], $this->tableOptions);
 ```
 
