@@ -31,11 +31,11 @@ return [
     ],
     'controllerMap' => [
         'migrate' => [
-            'class' => 'yii\console\controllers\MigrateController',
+            'class' => yii\console\controllers\MigrateController::class,
             'templateFile' => '@jamband/schemadump/template.php',
         ],
         'schemadump' => [
-            'class' => 'jamband\schemadump\SchemaDumpController',
+            'class' => jamband\schemadump\SchemaDumpController::class,
         ],
     ],
     ...
