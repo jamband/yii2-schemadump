@@ -99,6 +99,7 @@ Check help.
 - NOT NULL
 - DEFAULT value
 - COMMENT
+- Unique key
 - Foreign key
 - Composite primary keys
 - Primary key without AUTO_INCREMENT
