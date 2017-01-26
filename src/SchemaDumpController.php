@@ -340,6 +340,7 @@ class SchemaDumpController extends Controller
             '$this->enum([' => '"ENUM (',
             '->notNull' => ' NOT NULL',
             '->null' => ' DEFAULT NULL',
+            '->defaultValue(' => ' DEFAULT ',
             '->comment(' => ' COMMENT ',
         ]));
     }

@@ -123,6 +123,7 @@ $this->createTable('{{%0200_default_values}}', [
     'integer' => $this->smallInteger(6)->notNull()->defaultValue(1),
     'string' => $this->string(255)->notNull()->defaultValue('UNKNOWN'),
     'enum' => "ENUM ('foo', 'bar', 'baz') DEFAULT NULL",
+    'enum_foo' => "ENUM ('foo', 'bar', 'baz') NOT NULL DEFAULT 'foo'",
 ], $this->tableOptions);
 
 // 0300_comment
