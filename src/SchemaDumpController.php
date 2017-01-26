@@ -302,7 +302,7 @@ class SchemaDumpController extends Controller
         }
 
         // unique key
-        if (!empty($unique) && !$column->isPrimaryKey) {
+        if (!$column->isPrimaryKey && in_array($column->name, (array)reset($unique), true)) {
             $definition .= '->unique()';
         }
 
