@@ -93,6 +93,7 @@ $this->createTable('{{%0070_uks}}', [
     'id' => $this->primaryKey(),
     'username' => $this->string(20)->notNull()->unique(),
     'email' => $this->string(255)->notNull()->unique(),
+    'password' => $this->string(255)->notNull(),
 ], $this->tableOptions);
 
 // 0100_types

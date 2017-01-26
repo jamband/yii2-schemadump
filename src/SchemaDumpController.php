@@ -302,8 +302,12 @@ class SchemaDumpController extends Controller
         }
 
         // unique key
-        if (!$column->isPrimaryKey && in_array($column->name, (array)reset($unique), true)) {
-            $definition .= '->unique()';
+        if (!$column->isPrimaryKey && !empty($unique)) {
+            foreach ($unique as $name) {
+                if (reset($name) === $column->name) {
+                    $definition .= '->unique()';
+                }
+            }
         }
 
         // default value
