@@ -36,6 +36,12 @@ return [
         ],
         'schemadump' => [
             'class' => jamband\schemadump\SchemaDumpController::class,
+            'db' => [
+                'class' => yii\db\Connection::class,
+                'dsn' => 'mysql:host=localhost;dbname=existing_database_name',
+                'username' => 'your_username',
+                'password' => 'your_password',
+            ],
         ],
     ],
     ...
@@ -46,7 +52,7 @@ And run `schemadump` command.
 
 ```
 cd /path/to/project
-./yii schemadump <existing_database_name>
+./yii schemadump
 ```
 
 Example output:
@@ -68,21 +74,21 @@ Copy the output code and paste it into a migration file.
 Generates the 'createTable' code. (default)
 
 ```
-./yii schemadump <existing_database_name>
-./yii schemadump/create <existing_database_name>
+./yii schemadump
+./yii schemadump/create
 ```
 
 Generates the 'dropTable' code.
 
 ```
-./yii schemadump/drop <existing_database_name>
+./yii schemadump/drop
 ```
 
 Useful commands (for macOS user):
 
 ```
-./yii schemadump <existing_database_name> | pbcopy
-./yii schemadump/drop <existing_database_name> | pbcopy
+./yii schemadump | pbcopy
+./yii schemadump/drop | pbcopy
 ```
 
 Check help.

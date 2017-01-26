@@ -26,13 +26,6 @@ class SchemaDumpControllerText extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        Yii::$app->set('db', [
-            'class' => Connection::class,
-            'dsn' => 'mysql:host=localhost;dbname=yii2_schemadump_test',
-            'username' => 'root',
-            'password' => getenv('DB_PASS'),
-        ]);
-
         Yii::$app->db->open();
 
         $statements = array_filter(explode(';', file_get_contents(__DIR__.'/mysql.sql')), 'trim');

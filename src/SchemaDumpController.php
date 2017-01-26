@@ -64,13 +64,12 @@ class SchemaDumpController extends Controller
 
     /**
      * Generates the 'createTable' code.
-     * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema name.
      * @return integer the status of the action execution
      */
-    public function actionCreate($schema = '')
+    public function actionCreate()
     {
         $stdout = '';
-        foreach ($this->getTableSchemas($schema) as $table) {
+        foreach ($this->db->schema->getTableSchemas() as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
@@ -79,7 +78,7 @@ class SchemaDumpController extends Controller
                 static::generatePrimaryKey($table->primaryKey, $table->columns).
                 static::generateTableOptions();
         }
-        foreach ($this->getTableSchemas($schema) as $table) {
+        foreach ($this->db->schema->getTableSchemas() as $table) {
             $stdout .= $this->generateForeignKey($table);
         }
         $this->stdout($stdout);
@@ -87,13 +86,12 @@ class SchemaDumpController extends Controller
 
     /**
      * Generates the 'dropTable' code.
-     * @param string $schema the schema of the tables. Defaults to empty string, meaning the current or default schema name.
      * @return integer the status of the action execution
      */
-    public function actionDrop($schema = '')
+    public function actionDrop()
     {
         $stdout = '';
-        foreach ($this->getTableSchemas($schema) as $table) {
+        foreach ($this->db->schema->getTableSchemas() as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
@@ -125,7 +123,6 @@ class SchemaDumpController extends Controller
         return sprintf("// %s\n", $name).
             sprintf("\$this->createTable('{{%%%s}}', [\n", $name);
     }
-
 
     /**
      * Returns the columns definition.
@@ -223,15 +220,6 @@ class SchemaDumpController extends Controller
     private static function generateDropTable($name)
     {
         return "\$this->dropTable('{{%$name}}');";
-    }
-
-    /**
-     * @param string $schema
-     * @return array
-     */
-    private function getTableSchemas($schema)
-    {
-        return $this->db->schema->getTableSchemas($schema);
     }
 
     /**
