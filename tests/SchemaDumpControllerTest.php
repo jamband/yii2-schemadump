@@ -35,7 +35,7 @@ class SchemaDumpControllerText extends \PHPUnit_Framework_TestCase
 
         Yii::$app->db->open();
 
-        $statements = array_filter(explode(';', file_get_contents(__DIR__.'/mysql.sql')), 'trim');
+        $statements = array_filter(explode(';', file_get_contents(__DIR__.'/schemas/mysql.sql')), 'trim');
         foreach ($statements as $statement) {
             Yii::$app->db->pdo->exec($statement);
         }
