@@ -21,7 +21,8 @@
     },
     "autoload": {
         "psr-4": {
-            "jamband\\schemadump\\": "src"
+            "jamband\\schemadump\\": "src",
+            "jamband\\schemadump\\tests\\": "tests"
         }
     }
 }

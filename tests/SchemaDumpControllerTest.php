@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace tests;
+namespace jamband\schemadump\tests;
 
 use Yii;
 use yii\db\Connection;
@@ -21,11 +21,18 @@ class SchemaDumpControllerText extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->controller = new BufferedSchemaDumpController('schemadump', Yii::$app);
+        $this->controller = new BufferedSchemaDumpMySQLController('schemadump', Yii::$app);
     }
 
     public static function setUpBeforeClass()
     {
+        Yii::$app->set('db', [
+            'class' => Connection::class,
+            'dsn' => 'mysql:host=localhost;dbname=yii2_schemadump_test',
+            'username' => 'root',
+            'password' => getenv('DB_PASS'),
+        ]);
+
         Yii::$app->db->open();
 
         $statements = array_filter(explode(';', file_get_contents(__DIR__.'/mysql.sql')), 'trim');
@@ -167,25 +174,7 @@ STDOUT
     }
 }
 
-class BufferedSchemaDumpController extends SchemaDumpController
+class BufferedSchemaDumpMySQLController extends SchemaDumpController
 {
-    private $stdOutBuffer = '';
-
-    /**
-     * @param string $string
-     */
-    public function stdout($string)
-    {
-        $this->stdOutBuffer .= $string;
-    }
-
-    /**
-     * @return string
-     */
-    public function flushStdOutBuffer()
-    {
-        $result = $this->stdOutBuffer;
-        $this->stdOutBuffer = '';
-        return $result;
-    }
+    use StdOutBufferControllerTrait;
 }

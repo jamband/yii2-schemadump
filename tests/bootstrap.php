@@ -18,12 +18,4 @@ require __DIR__.'/../vendor/yiisoft/yii2/Yii.php';
 new yii\console\Application([
     'id' => 'unit',
     'basePath' => __DIR__,
-    'components' => [
-        'db' => [
-            'class' => yii\db\Connection::class,
-            'dsn' => 'mysql:host=localhost;dbname=yii2_schemadump_test',
-            'username' => 'root',
-            'password' => getenv('DB_PASS'),
-        ],
-    ],
 ]);

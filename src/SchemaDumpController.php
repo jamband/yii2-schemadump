@@ -310,7 +310,7 @@ class SchemaDumpController extends Controller
         }
 
         // comment
-        if ('' !== $column->comment) {
+        if (null !== $column->comment && '' !== $column->comment) {
             $definition .= "->comment('".addslashes($column->comment)."')";
         }
 
