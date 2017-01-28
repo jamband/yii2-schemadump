@@ -15,7 +15,7 @@ use Yii;
 use yii\db\Connection;
 use jamband\schemadump\SchemaDumpController;
 
-class SchemaDumpControllerMySQLText extends \PHPUnit_Framework_TestCase
+class SchemaDumpControllerMySQLTest extends \PHPUnit_Framework_TestCase
 {
     private $controller;
 
