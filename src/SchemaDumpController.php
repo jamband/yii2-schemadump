@@ -229,27 +229,44 @@ class SchemaDumpController extends Controller
      */
     private static function getSchemaType($column)
     {
+        // primary key
         if ($column->isPrimaryKey && $column->autoIncrement) {
             if ('bigint' === $column->type) {
                 return 'bigPrimaryKey()';
             }
             return 'primaryKey()';
         }
+
+        // boolean
         if ('tinyint(1)' === $column->dbType) {
             return 'boolean()';
         }
+
+        // smallint
         if ('smallint' === $column->type) {
+            if (null === $column->size) {
+                return 'smallInteger()';
+            }
             return 'smallInteger';
         }
+
+        // bigint
         if ('bigint' === $column->type) {
+            if (null === $column->size) {
+                return 'bigInteger()';
+            }
             return 'bigInteger';
         }
+
+        // enum
         if (null !== $column->enumValues) {
             // https://github.com/yiisoft/yii2/issues/9797
             $enumValues = array_map('addslashes', $column->enumValues);
             return "enum(['".implode('\', \'', $enumValues)."'])";
         }
-        if (null === $column->size) {
+
+        // others
+        if (null === $column->size && 0 >= $column->scale) {
             return $column->type.'()';
         }
         return $column->type;
@@ -302,10 +319,13 @@ class SchemaDumpController extends Controller
         if ($column->defaultValue instanceof Expression) {
             $definition .= "->defaultExpression('$column->defaultValue')";
 
-        } elseif (null !== $column->defaultValue && is_int($column->defaultValue)) {
+        } elseif (is_int($column->defaultValue)) {
             $definition .= "->defaultValue($column->defaultValue)";
 
-        } elseif (null !== $column->defaultValue && is_string($column->defaultValue)) {
+        } elseif (is_bool($column->defaultValue)) {
+            $definition .= '->defaultValue('.var_export($column->defaultValue, true).')';
+
+        } elseif (is_string($column->defaultValue)) {
             $definition .= "->defaultValue('".addslashes($column->defaultValue)."')";
         }
 
