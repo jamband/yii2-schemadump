@@ -11,12 +11,7 @@ Generate the schema from an existing database.
 ## Installation
 
 ```
-php composer.phar require --dev --prefer-dist jamband/yii2-schemadump "*"
-```
-
-or add in composer.json (require-dev section)
-```
-"jamband/yii2-schemadump": "*"
+composer require --dev --prefer-dist jamband/yii2-schemadump "*"
 ```
 
 ## Usage
