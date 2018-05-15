@@ -70,6 +70,7 @@ DROP TABLE IF EXISTS `0200_default_values`;
 CREATE TABLE `0200_default_values` (
     `integer` SMALLINT(6) NOT NULL DEFAULT 1,
     `string` VARCHAR(255) NOT NULL DEFAULT 'UNKNOWN',
+    `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `enum` ENUM ('foo', 'bar', 'baz') DEFAULT NULL,
     `enum_foo` ENUM ('foo', 'bar', 'baz') NOT NULL DEFAULT 'foo'
 );
