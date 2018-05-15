@@ -27,6 +27,10 @@ before_install:
   - phpenv config-rm xdebug.ini || true
   - travis_retry composer self-update
 
+before_script:
+  - echo -e "[server]\nexplicit_defaults_for_timestamp=1" | sudo tee -a /etc/mysql/my.cnf
+  - sudo service mysql restart
+
 install:
   - travis_retry composer install --prefer-dist --no-interaction --no-suggest
 
