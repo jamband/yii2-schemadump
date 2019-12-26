@@ -9,22 +9,23 @@
  * file that was distributed with this source code.
  */
 
-namespace jamband\schemadump\tests;
+namespace tests;
 
+use jamband\schemadump\SchemaDumpController;
+use PHPUnit\Framework\TestCase;
 use Yii;
 use yii\db\Connection;
-use jamband\schemadump\SchemaDumpController;
 
-class SchemaDumpControllerSQLiteTest extends \PHPUnit_Framework_TestCase
+class SchemaDumpControllerSQLiteTest extends TestCase
 {
     private $controller;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->controller = new BufferedSchemaDumpSQLiteController('schemadump', Yii::$app);
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         Yii::$app->set('db', [
             'class' => Connection::class,
@@ -39,7 +40,7 @@ class SchemaDumpControllerSQLiteTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-    public function testActionCreate()
+    public function testActionCreate(): void
     {
         $this->controller->run('create');
         $this->assertSame(<<<'STDOUT'
@@ -96,7 +97,7 @@ STDOUT
         , $this->controller->flushStdOutBuffer());
     }
 
-    public function testDropAction()
+    public function testDropAction(): void
     {
         $this->controller->run('drop');
         $this->assertSame(<<<'STDOUT'

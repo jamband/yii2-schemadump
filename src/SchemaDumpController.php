@@ -11,11 +11,14 @@
 
 namespace jamband\schemadump;
 
-use Yii;
+use yii\base\Action;
+use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
 use yii\console\Controller;
+use yii\console\ExitCode;
+use yii\db\ColumnSchema;
 use yii\db\Connection;
 use yii\db\Expression;
-use yii\db\Schema;
 use yii\db\TableSchema;
 use yii\di\Instance;
 
@@ -40,7 +43,8 @@ class SchemaDumpController extends Controller
     public $db = 'db';
 
     /**
-     * @inheritdoc
+     * @param string $actionID
+     * @return array|string[]
      */
     public function options($actionID)
     {
@@ -51,37 +55,47 @@ class SchemaDumpController extends Controller
     }
 
     /**
-     * @inheritdoc
+     * @param Action $action
+     * @return bool
+     * @throws InvalidConfigException
      */
     public function beforeAction($action)
     {
         if (!parent::beforeAction($action)) {
             return false;
         }
+
         $this->db = Instance::ensure($this->db, Connection::class);
+
         return true;
     }
 
     /**
-     * Generates the 'createTable' code.
-     * @return integer the status of the action execution
+     * @return int
+     * @throws NotSupportedException
      */
     public function actionCreate()
     {
         $stdout = '';
+
         foreach ($this->db->schema->getTableSchemas() as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
+
             $stdout .= static::generateCreateTable($table->name).
                 static::generateColumns($table->columns, $this->db->schema->findUniqueIndexes($table)).
                 static::generatePrimaryKey($table->primaryKey, $table->columns).
                 static::generateTableOptions();
         }
+
         foreach ($this->db->schema->getTableSchemas() as $table) {
             $stdout .= $this->generateForeignKey($table);
         }
+
         $this->stdout($stdout);
+
+        return ExitCode::OK;
     }
 
     /**
@@ -91,11 +105,14 @@ class SchemaDumpController extends Controller
     public function actionDrop()
     {
         $stdout = '';
+
         foreach ($this->db->schema->getTableSchemas() as $table) {
             if ($table->name === $this->migrationTable) {
                 continue;
             }
+
             $stdout .= static::generateDropTable($table->name);
+
             if (!empty($table->foreignKeys)) {
                 $stdout .= ' // fk: ';
 
@@ -104,14 +121,20 @@ class SchemaDumpController extends Controller
                         if (0 === $k) {
                             continue;
                         }
+
                         $stdout .= "$k, ";
                     }
                 }
+
                 $stdout = rtrim($stdout, ', ');
             }
+
             $stdout .= "\n";
         }
+
         $this->stdout($stdout);
+
+        return ExitCode::OK;
     }
 
     /**
@@ -133,6 +156,7 @@ class SchemaDumpController extends Controller
     private static function generateColumns(array $columns, array $unique)
     {
         $definition = '';
+
         foreach ($columns as $column) {
             $tmp = sprintf("    '%s' => \$this->%s%s,\n",
                 $column->name, static::getSchemaType($column), static::other($column, $unique));
@@ -140,8 +164,10 @@ class SchemaDumpController extends Controller
             if (null !== $column->enumValues) {
                 $tmp = static::replaceEnumColumn($tmp);
             }
+
             $definition .= $tmp;
         }
+
         return $definition;
     }
 
@@ -156,21 +182,26 @@ class SchemaDumpController extends Controller
         if (empty($pk)) {
             return '';
         }
+
         // Composite primary keys
         if (2 <= count($pk)) {
             $compositePk = implode(', ', $pk);
             return "    'PRIMARY KEY ($compositePk)',\n";
         }
+
         // Primary key not an auto-increment
         $flag = false;
+
         foreach ($columns as $column) {
             if ($column->autoIncrement) {
                 $flag = true;
             }
         }
+
         if (false === $flag) {
             return sprintf("    'PRIMARY KEY (%s)',\n", $pk[0]);
         }
+
         return '';
     }
 
@@ -184,14 +215,15 @@ class SchemaDumpController extends Controller
 
     /**
      * Returns the foreign key definition.
-     * @param TableSchema[] $table
+     * @param TableSchema $table
      * @return string|null foreign key definition or null
      */
-    private function generateForeignKey($table)
+    private function generateForeignKey(TableSchema $table)
     {
         if (empty($table->foreignKeys)) {
-            return;
+            return null;
         }
+
         $definition = "// fk: $table->name\n";
 
         foreach ($table->foreignKeys as $fk) {
@@ -207,9 +239,11 @@ class SchemaDumpController extends Controller
                     $refColumns = $v;
                 }
             }
+
             $definition .= sprintf("\$this->addForeignKey('%s', '{{%%%s}}', '%s', '{{%%%s}}', '%s');\n",
                 'fk_'.$table->name.'_'.$columns, $table->name, $columns, $refTable, $refColumns);
         }
+
         return "$definition\n";
     }
 
@@ -224,10 +258,10 @@ class SchemaDumpController extends Controller
 
     /**
      * Returns the schema type.
-     * @param ColumnSchema[] $column
+     * @param ColumnSchema $column
      * @return string the schema type
      */
-    private static function getSchemaType($column)
+    private static function getSchemaType(ColumnSchema $column)
     {
         // primary key
         if ($column->isPrimaryKey && $column->autoIncrement) {
@@ -269,16 +303,17 @@ class SchemaDumpController extends Controller
         if (null === $column->size && 0 >= $column->scale) {
             return $column->type.'()';
         }
+
         return $column->type;
     }
 
     /**
      * Returns the other definition.
-     * @param ColumnSchema[] $column
+     * @param ColumnSchema $column
      * @param array $unique
      * @return string the other definition
      */
-    private static function other($column, array $unique)
+    private static function other(ColumnSchema $column, array $unique)
     {
         $definition = '';
 
