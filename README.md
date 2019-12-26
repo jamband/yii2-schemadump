@@ -11,7 +11,7 @@ Generate the schema from an existing database.
 ## Installation
 
 ```
-composer require --dev --prefer-dist jamband/yii2-schemadump "*"
+composer require --dev jamband/yii2-schemadump
 ```
 
 ## Usage
