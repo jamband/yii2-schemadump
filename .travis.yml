@@ -1,13 +1,17 @@
+dist: bionic
+
 language: php
 
 php:
-  - 5.6
-  - 7.0
-  - 7.1
   - 7.2
+  - 7.3
+  - 7.4
 
-dist: trusty
 sudo: required
+
+cache:
+  directories:
+    - $HOME/.composer/cache
 
 services:
   - mysql
@@ -15,8 +19,6 @@ services:
 
 addons:
   apt:
-    sources:
-      - mysql-5.7-trusty
     packages:
       - mysql-server
       - mysql-client
@@ -35,8 +37,4 @@ install:
   - travis_retry composer install --prefer-dist --no-interaction --no-suggest
 
 script:
-  - vendor/bin/phpunit --verbose
-
-cache:
-  directories:
-    - $HOME/.composer/cache
+  - vendor/bin/phpunit
