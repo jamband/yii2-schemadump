@@ -8,6 +8,11 @@ Generate the schema from an existing database.
 
 ![gif](https://raw.githubusercontent.com/jamband/jamband.github.io/master/images/yii2-schemadump.gif)
 
+## Requirements
+
+- PHP 7.3 or later
+- Yii 2.x
+
 ## Installation
 
 ```
