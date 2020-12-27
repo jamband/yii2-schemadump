@@ -1,6 +1,6 @@
 # yii2-schemadump
 
-[![Latest Stable Version](https://poser.pugx.org/jamband/yii2-schemadump/v/stable.svg)](https://packagist.org/packages/jamband/yii2-schemadump) [![Total Downloads](https://poser.pugx.org/jamband/yii2-schemadump/downloads.svg)](https://packagist.org/packages/jamband/yii2-schemadump)
+[![Build Status](https://github.com/jamband/yii2-schemadump/workflows/tests/badge.svg)](https://github.com/jamband/yii2-schemadump/actions?workflow=tests) [![Latest Stable Version](https://img.shields.io/packagist/v/jamband/yii2-schemadump)](https://packagist.org/packages/jamband/yii2-schemadump) [![Total Downloads](https://img.shields.io/packagist/dt/jamband/yii2-schemadump)](https://packagist.org/packages/jamband/yii2-schemadump)
 
 Generate the schema from an existing database.
 
