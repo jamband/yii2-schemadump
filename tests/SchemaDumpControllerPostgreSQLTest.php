@@ -31,7 +31,7 @@ class SchemaDumpControllerPostgreSQLTest extends TestCase
             'class' => Connection::class,
             'dsn' => 'pgsql:host=localhost;dbname=yii2_schemadump_test',
             'username' => 'postgres',
-            'password' => '',
+            'password' => 'postgres',
         ]);
 
         Yii::$app->db->open();

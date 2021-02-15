@@ -31,7 +31,7 @@ class SchemaDumpControllerMySQLTest extends TestCase
             'class' => Connection::class,
             'dsn' => 'mysql:host=localhost;dbname=yii2_schemadump_test',
             'username' => 'root',
-            'password' => '',
+            'password' => 'root',
         ]);
 
         Yii::$app->db->open();
