@@ -12,15 +12,11 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: yii2_schemadump_test
         ports:
           - 3306:3306
-        options: >-
-          --health-cmd mysqladmin ping
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
       postgres:
         image: postgres:12.5
         env:
@@ -29,11 +25,7 @@ jobs:
           POSTGRES_DB: yii2_schemadump_test
         ports:
           - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 3
+        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
     strategy:
       fail-fast: true
       matrix:
