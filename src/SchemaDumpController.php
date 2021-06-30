@@ -96,6 +96,33 @@ class SchemaDumpController extends Controller
         $this->stdout($stdout);
 
         return ExitCode::OK;
+    }    
+    
+    public function actionData()
+    {
+        $stdout = '';
+
+        foreach ($this->db->schema->getTableSchemas() as $table) {
+            if ($table->name === $this->migrationTable) {
+                continue;
+            }
+
+            $data = \Yii::$app->db->createCommand('SELECT * FROM `' . $table->name . '`')->queryAll();
+            foreach ($data as $row) {
+                $out = '$this->insert(\'{{%' . $table->name . '}}\',[';
+                foreach ($table->columns as $column) {
+                    $out .= "'" . $column->name . "'=>'" . addslashes($row[ $column->name ]) . "',";
+                }
+                $out = rtrim($out, ',') . ']);';
+                $stdout .= $out."\n";
+            }
+
+            $stdout .= "\n";
+        }
+
+        $this->stdout($stdout);
+
+        return ExitCode::OK;
     }
 
     /**
