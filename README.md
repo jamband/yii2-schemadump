@@ -10,7 +10,7 @@ Generate the schema from an existing database.
 
 ## Requirements
 
-- PHP 7.3 or later
+- PHP 7.4 or later
 - Yii 2.x
 
 ## Installation
